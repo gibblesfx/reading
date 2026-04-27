@@ -52,7 +52,6 @@
             padding: 20px 20px 140px 20px;
         }
 
-        /* LIFT AND TILT */
         .card {
             background: white;
             border: 5px solid #1e90ff;
@@ -147,6 +146,15 @@
 
         let stars = 0;
 
+        function getBestVoice() {
+            const voices = window.speechSynthesis.getVoices();
+            // Look for Google or Microsoft "Natural" voices first
+            return voices.find(v => v.name.includes('Google') && v.lang.includes('en-US')) || 
+                   voices.find(v => v.name.includes('Natural') && v.lang.includes('en-US')) ||
+                   voices.find(v => v.lang.includes('en-US')) || 
+                   voices[0];
+        }
+
         function loadLevel(levelId, btn) {
             window.speechSynthesis.cancel();
             document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
@@ -167,8 +175,11 @@
                         card.classList.add('active');
                         const dot = card.querySelector('.speaking-dot');
                         dot.style.display = 'block';
+                        
                         const msg = new SpeechSynthesisUtterance(isSentence ? item.w.toLowerCase() : `${item.l.toLowerCase()}... ${item.w.toLowerCase()}`);
-                        msg.rate = isSentence ? 0.7 : 0.8;
+                        msg.voice = getBestVoice();
+                        msg.rate = isSentence ? 0.8 : 0.9;
+                        
                         msg.onend = () => {
                             stars++;
                             document.getElementById('star-count').innerText = stars;
@@ -187,7 +198,9 @@
             let wordHtml = `<div class="blend-display">`;
             chars.forEach((c, i) => wordHtml += `<span id="char-${word}-${i}">${c}</span>`);
             wordHtml += `</div>`;
-            card.innerHTML = `<div class="speaking-dot"></div>${wordHtml}<div class="slider-container"><input type="range" min="0" max="${chars.length}" value="0" oninput="handleBlend(this, '${word}', this.parentElement.parentElement)"></div><p style="color:#aaa; font-size:0.8rem">Slide to blend!</p>`;
+            
+            // Slider max is length of word (for letters) + 1 (for the full word sweep)
+            card.innerHTML = `<div class="speaking-dot"></div>${wordHtml}<div class="slider-container"><input type="range" min="0" max="${chars.length + 1}" value="0" oninput="handleBlend(this, '${word}', this.parentElement.parentElement)"></div><p style="color:#aaa; font-size:0.8rem">Slide for C-A-T-CAT!</p>`;
         }
 
         function handleBlend(slider, word, card) {
@@ -196,30 +209,35 @@
             const chars = word.split('');
             const dot = card.querySelector('.speaking-dot');
             
-            // Reset highlighting
             chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = '');
 
             if (val > 0) {
-                const index = val - 1;
-                document.getElementById(`char-${word}-${index}`).className = 'char-active';
                 dot.style.display = 'block';
-                
-                // Correct Blending logic: Individual letters, then full word sweep at the very end
-                const isFinalWord = (val === chars.length); 
-                const msg = new SpeechSynthesisUtterance(isFinalWord ? word.toLowerCase() : chars[index].toLowerCase());
-                msg.rate = isFinalWord ? 0.7 : 1.1;
-                
-                msg.onend = () => {
-                    dot.style.display = 'none';
-                    if(isFinalWord) {
+                let msg;
+
+                if (val <= chars.length) {
+                    // Step 1-3: Individual Letters
+                    const index = val - 1;
+                    document.getElementById(`char-${word}-${index}`).className = 'char-active';
+                    msg = new SpeechSynthesisUtterance(chars[index].toLowerCase());
+                    msg.rate = 1.1;
+                } else {
+                    // Step 4: FULL WORD
+                    chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = 'char-active');
+                    msg = new SpeechSynthesisUtterance(word.toLowerCase());
+                    msg.rate = 0.7;
+                    msg.onend = () => {
                         stars += 2;
                         document.getElementById('star-count').innerText = stars;
                         setTimeout(() => {
                             slider.value = 0;
                             chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = '');
+                            dot.style.display = 'none';
                         }, 1000);
-                    }
-                };
+                    };
+                }
+                
+                msg.voice = getBestVoice();
                 window.speechSynthesis.speak(msg);
             } else {
                 dot.style.display = 'none';
@@ -227,6 +245,8 @@
         }
 
         window.onload = () => loadLevel('l1', document.querySelector('.level-btn'));
+        // Pre-fetch voices
+        window.speechSynthesis.onvoiceschanged = getBestVoice;
     </script>
 </body>
 </html>
