@@ -40,6 +40,7 @@
 
         .level-btn:hover { transform: scale(1.1); background: #f1f9ff; }
         .level-btn.active { background: #1e90ff; color: white; box-shadow: 0 5px 15px rgba(30,144,255,0.4); }
+        .level-btn.red-mode.active { background: #ff4757; border-color: #ff4757; }
         .level-btn.blend-mode.active { background: #ffa502; border-color: #ffa502; }
 
         .grid {
@@ -87,8 +88,14 @@
             100% { transform: scale(2.5); opacity: 0; }
         }
 
+        .letter-header { font-size: 3.5rem; color: #1e90ff; font-weight: bold; margin-bottom: 5px; }
+        .target-word { font-weight: bold; color: #2f3542; font-size: 2.4rem; }
+        
+        .card.red-word { border-color: #ff4757; }
+        .card.red-word .letter-header { color: #ff4757; }
+
         .blend-display { font-size: 4rem; letter-spacing: 15px; margin-bottom: 20px; font-weight: bold; }
-        .char-active { color: #ffa502; transform: scale(1.4); display: inline-block; }
+        .char-active { color: #ffa502; transform: scale(1.4); display: inline-block; transition: all 0.1s ease; }
 
         .slider-container { width: 90%; margin-top: 15px; }
         input[type=range] { width: 100%; cursor: pointer; height: 35px; }
@@ -98,7 +105,7 @@
             bottom: 0; left: 0; width: 100%;
             background: white; padding: 15px;
             box-shadow: 0 -5px 15px rgba(0,0,0,0.08);
-            font-size: 2.2rem; color: #ffa502; font-weight: bold;
+            font-size: 2.2rem; color: #ffa502; font-weight: bold; z-index: 100;
         }
     </style>
 </head>
@@ -108,6 +115,12 @@
     
     <div class="nav-container">
         <button class="level-btn active" onclick="loadLevel('l1', this)">L1</button>
+        <button class="level-btn" onclick="loadLevel('l2', this)">L2</button>
+        <button class="level-btn" onclick="loadLevel('l3', this)">L3</button>
+        <button class="level-btn" onclick="loadLevel('l4', this)">L4</button>
+        <button class="level-btn" onclick="loadLevel('l5', this)">L5</button>
+        <button class="level-btn" onclick="loadLevel('l6', this)">L6</button>
+        <button class="level-btn red-mode" onclick="loadLevel('red', this)">Red Words</button>
         <button class="level-btn blend-mode" onclick="loadLevel('blend', this)">🌟 Blending</button>
     </div>
 
@@ -116,13 +129,24 @@
 
     <script>
         const wordData = {
-            l1: [{w:"ANT", l:"A"}, {w:"BAT", l:"B"}, {w:"CAT", l:"C"}, {w:"DOG", l:"D"}, {w:"EGG", l:"E"}],
+            l1: [{w:"ANT", l:"A"}, {w:"BAT", l:"B"}, {w:"CAT", l:"C"}, {w:"DOG", l:"D"}, {w:"EGG", l:"E"}, {w:"FAN", l:"F"}, {w:"GUM", l:"G"}, {w:"HAT", l:"H"}, {w:"INK", l:"I"}, {w:"JAM", l:"J"}, {w:"KIT", l:"K"}, {w:"LOG", l:"L"}, {w:"MAP", l:"M"}, {w:"NET", l:"N"}, {w:"OWL", l:"O"}, {w:"PIG", l:"P"}, {w:"QUB", l:"Q"}, {w:"RUN", l:"R"}, {w:"SUN", l:"S"}, {w:"TEN", l:"T"}, {w:"UP!", l:"U"}, {w:"VAN", l:"V"}, {w:"WIG", l:"W"}, {w:"BOX", l:"X"}, {w:"YAK", l:"Y"}, {w:"ZAP", l:"Z"}],
+            l2: [{w:"ATOM", l:"A"}, {w:"BIRD", l:"B"}, {w:"CAKE", l:"C"}, {w:"DUCK", l:"D"}, {w:"EAST", l:"E"}, {w:"FISH", l:"F"}, {w:"GATE", l:"G"}, {w:"HAND", l:"H"}, {w:"IRON", l:"I"}, {w:"JEEP", l:"J"}, {w:"KITE", l:"K"}, {w:"LAMP", l:"L"}, {w:"MOON", l:"M"}, {w:"NEST", l:"N"}, {w:"OPEN", l:"O"}, {w:"PINK", l:"P"}, {w:"QUIT", l:"Q"}, {w:"RAIN", l:"R"}, {w:"STAR", l:"S"}, {w:"TREE", l:"T"}, {w:"UNIT", l:"U"}, {w:"VEST", l:"V"}, {w:"WIND", l:"W"}, {w:"EXIT", l:"X"}, {w:"YELL", l:"Y"}, {w:"ZOOM", l:"Z"}],
+            l3: [{w:"APPLE", l:"A"}, {w:"BREAD", l:"B"}, {w:"CLOCK", l:"C"}, {w:"DRESS", l:"D"}, {w:"EAGLE", l:"E"}, {w:"FRUIT", l:"F"}, {w:"GRAPE", l:"G"}, {w:"HOUSE", l:"H"}, {w:"IGLOO", l:"I"}, {w:"JELLY", l:"J"}, {w:"KOALA", l:"K"}, {w:"LEMON", l:"L"}, {w:"MOUSE", l:"M"}, {w:"NIGHT", l:"N"}, {w:"OCEAN", l:"O"}, {w:"PLANE", l:"P"}, {w:"QUEEN", l:"Q"}, {w:"ROBOT", l:"R"}, {w:"SNAKE", l:"S"}, {w:"TRAIN", l:"T"}, {w:"UNCLE", l:"U"}, {w:"VOICE", l:"V"}, {w:"WATER", l:"W"}, {w:"XYLO", l:"X"}, {w:"YOUNG", l:"Y"}, {w:"ZEBRA", l:"Z"}],
+            l4: [{w:"AXLE", l:"A"}, {w:"BLAST", l:"B"}, {w:"CRISP", l:"C"}, {w:"DRIFT", l:"D"}, {w:"ENTRY", l:"E"}, {w:"FROST", l:"F"}, {w:"GRUNT", l:"G"}, {w:"HATCH", l:"H"}, {w:"INDEX", l:"I"}, {w:"JOINT", l:"J"}, {w:"KNOCK", l:"K"}, {w:"LUNCH", l:"L"}, {w:"MARCH", l:"M"}, {w:"NORTH", l:"N"}, {w:"ORDER", l:"O"}, {w:"PLANT", l:"P"}, {w:"QUICK", l:"Q"}, {w:"ROAST", l:"R"}, {w:"SMILE", l:"S"}, {w:"TRUST", l:"T"}, {w:"UNDER", l:"U"}, {w:"VIVID", l:"V"}, {w:"WHALE", l:"W"}, {w:"X-RAY", l:"X"}, {w:"YOUTH", l:"Y"}, {w:"ZESTY", l:"Z"}],
+            l5: [{w:"AIRPLANE", l:"A"}, {w:"BUTTERFLY", l:"B"}, {w:"COMPUTER", l:"C"}, {w:"DINOSAUR", l:"D"}, {w:"ELEPHANT", l:"E"}, {w:"FLAMINGO", l:"F"}, {w:"GIRAFFE", l:"G"}, {w:"HAMBURGER", l:"H"}, {w:"INVISIBLE", l:"I"}, {w:"JELLYFISH", l:"J"}, {w:"KANGAROO", l:"K"}, {w:"LIGHTNING", l:"L"}, {w:"MOUNTAIN", l:"M"}, {w:"NOTEBOOK", l:"N"}, {w:"OCTOPUS", l:"O"}, {w:"PENGUIN", l:"P"}, {w:"QUIETLY", l:"Q"}, {w:"RAINBOW", l:"R"}, {w:"SQUIRREL", l:"S"}, {w:"TELESCOPE", l:"T"}, {w:"UMBRELLA", l:"U"}, {w:"VEGETABLE", l:"V"}, {w:"WHEELBARROW", l:"W"}, {w:"XYLOPHONE", l:"X"}, {w:"YESTERDAY", l:"Y"}, {w:"ZOOLOGIST", l:"Z"}],
+            l6: [{w:"I LIKE CATS", l:"-"}, {w:"SEE THE DOG", l:"-"}, {w:"MY BIG RED HAT", l:"-"}, {w:"GO TO THE BED", l:"-"}, {w:"A FAST BLUE JEEP", l:"-"}, {w:"CAN YOU RUN?", l:"-"}, {w:"I SEE THE SUN", l:"-"}, {w:"THE BOX IS BIG", l:"-"}, {w:"LOOK AT THE PIG", l:"-"}, {w:"WE CAN PLAY", l:"-"}, {w:"THE CAT IS ON THE MAT", l:"-"}, {w:"I LIKE TO SWIM", l:"-"}, {w:"SEE THE GREEN TREE", l:"-"}, {w:"MY MOM IS KIND", l:"-"}, {w:"THE DUCK CAN QUACK", l:"-"}, {w:"HE HAS A TOY", l:"-"}, {w:"SHE SAW THE BIRD", l:"-"}, {w:"WE WENT TO THE PARK", l:"-"}, {w:"I CAN READ WORDS", l:"-"}, {w:"YOU ARE A STAR", l:"-"}],
+            red: [{w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"}, {w:"THEY", l:"T"}, {w:"FROM", l:"F"}, {w:"DOES", l:"D"}, {w:"WHAT", l:"W"}, {w:"WANT", l:"W"}, {w:"GIVE", l:"G"}, {w:"SOME", l:"S"}, {w:"BECAUSE", l:"B"}, {w:"COULD", l:"C"}, {w:"YOUR", l:"Y"}, {w:"PEOPLE", l:"P"}, {w:"THROUGH", l:"T"}, {w:"THOUGHT", l:"T"}, {w:"LAUGH", l:"L"}, {w:"WHO", l:"W"}, {w:"WERE", l:"W"}, {w:"WHERE", l:"W"}, {w:"ONCE", l:"O"}, {w:"DOOR", l:"D"}, {w:"EYE", l:"E"}],
             blend: [
                 {w:"CAT", p:["cuh", "ah", "tuh"]}, 
                 {w:"DOG", p:["duh", "aw", "guh"]}, 
                 {w:"SUN", p:["suh", "uh", "nuh"]}, 
                 {w:"MAP", p:["muh", "ah", "puh"]}, 
-                {w:"TEN", p:["tuh", "eh", "nuh"]}
+                {w:"TEN", p:["tuh", "eh", "nuh"]}, 
+                {w:"PIG", p:["puh", "ih", "guh"]}, 
+                {w:"FOX", p:["fuh", "aw", "ks"]}, 
+                {w:"BAT", p:["buh", "ah", "tuh"]}, 
+                {w:"JAM", p:["juh", "ah", "muh"]}, 
+                {w:"LOG", p:["luh", "aw", "guh"]}
             ]
         };
 
@@ -131,7 +155,9 @@
         function getBestVoice() {
             const voices = window.speechSynthesis.getVoices();
             return voices.find(v => v.name.includes('Google') && v.lang.includes('en-US')) || 
-                   voices.find(v => v.lang.includes('en-US')) || voices[0];
+                   voices.find(v => v.name.includes('Natural') && v.lang.includes('en-US')) ||
+                   voices.find(v => v.lang.includes('en-US')) || 
+                   voices[0];
         }
 
         function loadLevel(levelId, btn) {
@@ -143,7 +169,7 @@
 
             wordData[levelId].forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'card';
+                card.className = 'card' + (levelId === 'red' ? ' red-word' : '');
                 
                 if(levelId === 'blend') {
                     const word = item.w;
@@ -152,31 +178,37 @@
                     chars.forEach((c, i) => wordHtml += `<span id="char-${word}-${i}">${c}</span>`);
                     wordHtml += `</div>`;
                     
-                    card.innerHTML = `<div class="speaking-dot"></div>${wordHtml}<div class="slider-container"><input type="range" min="0" max="${chars.length + 1}" value="0" oninput="handleBlend(this, '${word}', this.parentElement.parentElement)"></div>`;
+                    card.innerHTML = `
+                        <div class="speaking-dot"></div>
+                        ${wordHtml}
+                        <div class="slider-container">
+                            <input type="range" min="0" max="${chars.length + 1}" value="0" 
+                            oninput="handleBlend(this, '${word}', this.parentElement.parentElement)">
+                        </div>`;
                     card.dataset.phonetics = JSON.stringify(item.p);
                 } else {
-                    card.innerHTML = `<div class="speaking-dot"></div><span class="letter-header">${item.l}${item.l.toLowerCase()}</span><span class="target-word">${item.w}</span>`;
-                    card.onclick = () => speakWord(item.l.toLowerCase() + "... " + item.w.toLowerCase(), card);
+                    const isSentence = item.l === "-";
+                    card.innerHTML = `<div class="speaking-dot"></div><span class="letter-header">${isSentence ? "" : item.l + item.l.toLowerCase()}</span><span class="target-word" style="font-size: ${isSentence ? '1.8rem' : '2.4rem'}">${item.w}</span>`;
+                    card.onclick = () => {
+                        window.speechSynthesis.cancel();
+                        card.classList.add('active');
+                        const dot = card.querySelector('.speaking-dot');
+                        dot.style.display = 'block';
+                        
+                        const msg = new SpeechSynthesisUtterance(isSentence ? item.w.toLowerCase() : `${item.l.toLowerCase()}... ${item.w.toLowerCase()}`);
+                        msg.voice = getBestVoice();
+                        msg.rate = 0.8;
+                        msg.onend = () => {
+                            stars++;
+                            document.getElementById('star-count').innerText = stars;
+                            dot.style.display = 'none';
+                            card.classList.remove('active');
+                        };
+                        window.speechSynthesis.speak(msg);
+                    };
                 }
                 grid.appendChild(card);
             });
-        }
-
-        function speakWord(text, card) {
-            window.speechSynthesis.cancel();
-            const dot = card.querySelector('.speaking-dot');
-            dot.style.display = 'block';
-            card.classList.add('active');
-            
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.voice = getBestVoice();
-            msg.onend = () => {
-                dot.style.display = 'none';
-                card.classList.remove('active');
-                stars++;
-                document.getElementById('star-count').innerText = stars;
-            };
-            window.speechSynthesis.speak(msg);
         }
 
         function handleBlend(slider, word, card) {
@@ -195,11 +227,9 @@
                 if (val <= chars.length) {
                     const index = val - 1;
                     document.getElementById(`char-${word}-${index}`).className = 'char-active';
-                    // Speak just the short sound (e.g., "cuh")
                     msg = new SpeechSynthesisUtterance(phonetics[index]);
-                    msg.rate = 0.8;
+                    msg.rate = 0.9;
                 } else {
-                    // Full word sweep
                     chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = 'char-active');
                     msg = new SpeechSynthesisUtterance(word.toLowerCase());
                     msg.rate = 0.7;
