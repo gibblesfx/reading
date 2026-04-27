@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reading Adventure</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0faff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 { color: #ff6347; font-size: 3rem; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border: 4px solid #4ca1af;
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .card:hover { transform: scale(1.1); background-color: #fff4e1; }
+
+        .letter { font-size: 4rem; display: block; font-weight: bold; color: #2c3e50; }
+        .word { font-size: 1.2rem; color: #7f8c8d; visibility: hidden; }
+
+        .card.active .word { visibility: visible; }
+    </style>
+</head>
+<body>
+
+    <h1>Let's Read! 🍎</h1>
+    <p>Click a card to hear the sound!</p>
+
+    <div class="grid">
+        <div class="card" onclick="playLetter('A', 'Apple')">
+            <span class="letter">Aa</span>
+            <span class="word">Apple</span>
+        </div>
+
+        <div class="card" onclick="playLetter('B', 'Ball')">
+            <span class="letter">Bb</span>
+            <span class="word">Ball</span>
+        </div>
+
+        <div class="card" onclick="playLetter('C', 'Cat')">
+            <span class="letter">Cc</span>
+            <span class="word">Cat</span>
+        </div>
+
+        <div class="card" onclick="playLetter('D', 'Dog')">
+            <span class="letter">Dd</span>
+            <span class="word">Dog</span>
+        </div>
+    </div>
+
+    <script>
+        function playLetter(letter, word) {
+            // This uses the browser's built-in voice
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = `${letter}. ${letter} is for ${word}`;
+            msg.rate = 0.8; // Slower for kids
+            window.speechSynthesis.speak(msg);
+
+            // Toggle visual word
+            event.currentTarget.classList.toggle('active');
+        }
+    </script>
+
+</body>
+</html>
