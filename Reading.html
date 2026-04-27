@@ -141,14 +141,24 @@
             l5: [{w:"AIRPLANE", l:"A"}, {w:"BUTTERFLY", l:"B"}, {w:"COMPUTER", l:"C"}, {w:"DINOSAUR", l:"D"}, {w:"ELEPHANT", l:"E"}, {w:"FLAMINGO", l:"F"}, {w:"GIRAFFE", l:"G"}, {w:"HAMBURGER", l:"H"}, {w:"INVISIBLE", l:"I"}, {w:"JELLYFISH", l:"J"}, {w:"KANGAROO", l:"K"}, {w:"LIGHTNING", l:"L"}, {w:"MOUNTAIN", l:"M"}, {w:"NOTEBOOK", l:"N"}, {w:"OCTOPUS", l:"O"}, {w:"PENGUIN", l:"P"}, {w:"QUIETLY", l:"Q"}, {w:"RAINBOW", l:"R"}, {w:"SQUIRREL", l:"S"}, {w:"TELESCOPE", l:"T"}, {w:"UMBRELLA", l:"U"}, {w:"VEGETABLE", l:"V"}, {w:"WHEELBARROW", l:"W"}, {w:"XYLOPHONE", l:"X"}, {w:"YESTERDAY", l:"Y"}, {w:"ZOOLOGIST", l:"Z"}],
             l6: [{w:"I LIKE CATS", l:"-"}, {w:"SEE THE DOG", l:"-"}, {w:"MY BIG RED HAT", l:"-"}, {w:"GO TO THE BED", l:"-"}, {w:"A FAST BLUE JEEP", l:"-"}, {w:"CAN YOU RUN?", l:"-"}, {w:"I SEE THE SUN", l:"-"}, {w:"THE BOX IS BIG", l:"-"}, {w:"LOOK AT THE PIG", l:"-"}, {w:"WE CAN PLAY", l:"-"}, {w:"THE CAT IS ON THE MAT", l:"-"}, {w:"I LIKE TO SWIM", l:"-"}, {w:"SEE THE GREEN TREE", l:"-"}, {w:"MY MOM IS KIND", l:"-"}, {w:"THE DUCK CAN QUACK", l:"-"}, {w:"HE HAS A TOY", l:"-"}, {w:"SHE SAW THE BIRD", l:"-"}, {w:"WE WENT TO THE PARK", l:"-"}, {w:"I CAN READ WORDS", l:"-"}, {w:"YOU ARE A STAR", l:"-"}],
             red: [{w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"}, {w:"THEY", l:"T"}, {w:"FROM", l:"F"}, {w:"DOES", l:"D"}, {w:"WHAT", l:"W"}, {w:"WANT", l:"W"}, {w:"GIVE", l:"G"}, {w:"SOME", l:"S"}, {w:"BECAUSE", l:"B"}, {w:"COULD", l:"C"}, {w:"YOUR", l:"Y"}, {w:"PEOPLE", l:"P"}, {w:"THROUGH", l:"T"}, {w:"THOUGHT", l:"T"}, {w:"LAUGH", l:"L"}, {w:"WHO", l:"W"}, {w:"WERE", l:"W"}, {w:"WHERE", l:"W"}, {w:"ONCE", l:"O"}, {w:"DOOR", l:"D"}, {w:"EYE", l:"E"}],
-            blend: [{w:"CAT"}, {w:"DOG"}, {w:"SUN"}, {w:"MAP"}, {w:"TEN"}, {w:"PIG"}, {w:"FOX"}, {w:"BAT"}, {w:"JAM"}, {w:"LOG"}]
+            blend: [
+                {w:"CAT", p:["k", "ah", "t"]}, 
+                {w:"DOG", p:["d", "aw", "g"]}, 
+                {w:"SUN", p:["s", "uh", "n"]}, 
+                {w:"MAP", p:["m", "ah", "p"]}, 
+                {w:"TEN", p:["t", "eh", "n"]}, 
+                {w:"PIG", p:["p", "ih", "g"]}, 
+                {w:"FOX", p:["f", "aw", "ks"]}, 
+                {w:"BAT", p:["b", "ah", "t"]}, 
+                {w:"JAM", p:["j", "ah", "m"]}, 
+                {w:"LOG", p:["l", "aw", "g"]}
+            ]
         };
 
         let stars = 0;
 
         function getBestVoice() {
             const voices = window.speechSynthesis.getVoices();
-            // Look for Google or Microsoft "Natural" voices first
             return voices.find(v => v.name.includes('Google') && v.lang.includes('en-US')) || 
                    voices.find(v => v.name.includes('Natural') && v.lang.includes('en-US')) ||
                    voices.find(v => v.lang.includes('en-US')) || 
@@ -166,7 +176,7 @@
                 const card = document.createElement('div');
                 card.className = 'card' + (levelId === 'red' ? ' red-word' : '');
                 if(levelId === 'blend') {
-                    createBlendCard(card, item.w);
+                    createBlendCard(card, item);
                 } else {
                     const isSentence = item.l === "-";
                     card.innerHTML = `<div class="speaking-dot"></div><span class="letter-header">${isSentence ? "" : item.l + item.l.toLowerCase()}</span><span class="target-word" style="font-size: ${isSentence ? '1.8rem' : '2.4rem'}">${item.w}</span>`;
@@ -193,17 +203,24 @@
             });
         }
 
-        function createBlendCard(card, word) {
+        function createBlendCard(card, item) {
+            const word = item.w;
             const chars = word.split('');
             let wordHtml = `<div class="blend-display">`;
             chars.forEach((c, i) => wordHtml += `<span id="char-${word}-${i}">${c}</span>`);
             wordHtml += `</div>`;
             
-            // Slider max is length of word (for letters) + 1 (for the full word sweep)
-            card.innerHTML = `<div class="speaking-dot"></div>${wordHtml}<div class="slider-container"><input type="range" min="0" max="${chars.length + 1}" value="0" oninput="handleBlend(this, '${word}', this.parentElement.parentElement)"></div><p style="color:#aaa; font-size:0.8rem">Slide for C-A-T-CAT!</p>`;
+            card.innerHTML = `
+                <div class="speaking-dot"></div>
+                ${wordHtml}
+                <div class="slider-container">
+                    <input type="range" min="0" max="${chars.length + 1}" value="0" 
+                    oninput="handleBlend(this, '${word}', ${JSON.stringify(item.p)}, this.parentElement.parentElement)">
+                </div>
+                <p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>`;
         }
 
-        function handleBlend(slider, word, card) {
+        function handleBlend(slider, word, phonetics, card) {
             window.speechSynthesis.cancel();
             const val = parseInt(slider.value);
             const chars = word.split('');
@@ -216,13 +233,14 @@
                 let msg;
 
                 if (val <= chars.length) {
-                    // Step 1-3: Individual Letters
+                    // Step 1-3: PHONETIC SOUNDS
                     const index = val - 1;
                     document.getElementById(`char-${word}-${index}`).className = 'char-active';
-                    msg = new SpeechSynthesisUtterance(chars[index].toLowerCase());
-                    msg.rate = 1.1;
+                    msg = new SpeechSynthesisUtterance(phonetics[index]); // Uses "ah", "k", "t" etc.
+                    msg.rate = 1.0;
+                    msg.pitch = 1.2;
                 } else {
-                    // Step 4: FULL WORD
+                    // Final Step: FULL WORD SWEEP
                     chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = 'char-active');
                     msg = new SpeechSynthesisUtterance(word.toLowerCase());
                     msg.rate = 0.7;
@@ -245,7 +263,6 @@
         }
 
         window.onload = () => loadLevel('l1', document.querySelector('.level-btn'));
-        // Pre-fetch voices
         window.speechSynthesis.onvoiceschanged = getBestVoice;
     </script>
 </body>
