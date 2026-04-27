@@ -21,30 +21,25 @@
             margin: 20px auto;
             display: flex;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
             max-width: 1100px;
         }
 
         .level-btn {
-            padding: 10px 16px;
-            font-size: 0.9rem;
+            padding: 12px 20px;
+            font-size: 1rem;
             border: 3px solid #1e90ff;
             border-radius: 50px;
             cursor: pointer;
             background: white;
             color: #1e90ff;
             font-weight: bold;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
-        .level-btn.active {
-            background: #1e90ff;
-            color: white;
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(30, 144, 255, 0.4);
-        }
-
+        .level-btn:hover { transform: scale(1.1); background: #f1f9ff; }
+        .level-btn.active { background: #1e90ff; color: white; box-shadow: 0 5px 15px rgba(30,144,255,0.4); }
         .level-btn.red-mode.active { background: #ff4757; border-color: #ff4757; }
         .level-btn.blend-mode.active { background: #ffa502; border-color: #ffa502; }
 
@@ -57,7 +52,7 @@
             padding: 20px 20px 140px 20px;
         }
 
-        /* RESTORED HOVER & TILT EFFECTS */
+        /* RESTORED LIFT AND TILT */
         .card {
             background: white;
             border: 5px solid #1e90ff;
@@ -65,36 +60,31 @@
             padding: 20px;
             cursor: pointer;
             position: relative;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s, border-color 0.3s;
             box-shadow: 0 8px 15px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 220px;
-            overflow: hidden;
         }
 
         .card:hover {
-            transform: translateY(-10px) rotate(2deg);
+            transform: translateY(-12px) rotate(3deg);
             border-color: #ffa502;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
         }
 
-        .card.active {
-            border-color: #2ed573 !important;
-            background-color: #f0fff4;
-            transform: scale(1.05);
-        }
+        .card.active { border-color: #2ed573; background-color: #f0fff4; transform: scale(1.05); }
 
-        /* RESTORED RED INDICATOR DOT */
+        /* PULSING RED DOT */
         .speaking-dot {
             display: none;
             position: absolute;
             top: 15px;
             right: 15px;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             background-color: #ff4757;
             border-radius: 50%;
             animation: pulse 1s infinite;
@@ -105,30 +95,24 @@
             100% { transform: scale(2.5); opacity: 0; }
         }
 
-        .letter-header { font-size: 3.2rem; color: #1e90ff; font-weight: bold; margin-bottom: 5px; line-height: 1; }
-        .target-word { font-weight: bold; color: #2f3542; line-height: 1.2; }
+        .letter-header { font-size: 3.5rem; color: #1e90ff; font-weight: bold; margin-bottom: 5px; }
+        .target-word { font-weight: bold; color: #2f3542; font-size: 2rem; }
         
         .card.red-word { border-color: #ff4757; }
         .card.red-word .letter-header { color: #ff4757; }
 
         .blend-display { font-size: 4rem; letter-spacing: 15px; margin-bottom: 20px; font-weight: bold; }
-        .char-active { color: #ffa502; transform: scale(1.2); display: inline-block; }
+        .char-active { color: #ffa502; transform: scale(1.25); display: inline-block; }
 
         .slider-container { width: 90%; margin-top: 15px; }
-        input[type=range] { width: 100%; cursor: pointer; height: 20px; }
+        input[type=range] { width: 100%; cursor: pointer; height: 25px; }
 
         .footer-score {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: white;
-            padding: 15px;
+            bottom: 0; left: 0; width: 100%;
+            background: white; padding: 15px;
             box-shadow: 0 -5px 15px rgba(0,0,0,0.08);
-            font-size: 2.2rem;
-            color: #ffa502;
-            font-weight: bold;
-            z-index: 100;
+            font-size: 2.2rem; color: #ffa502; font-weight: bold; z-index: 100;
         }
     </style>
 </head>
@@ -168,30 +152,18 @@
             window.speechSynthesis.cancel();
             document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
             const grid = document.getElementById('game-grid');
             grid.innerHTML = ''; 
 
             wordData[levelId].forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'card' + (levelId === 'red' ? ' red-word' : '');
-
                 if(levelId === 'blend') {
                     createBlendCard(card, item.w);
                 } else {
                     const isSentence = item.l === "-";
-                    const letterText = isSentence ? "" : item.l + item.l.toLowerCase();
-                    const fontSize = isSentence ? "1.7rem" : "2.4rem";
-                    
-                    card.innerHTML = `
-                        <div class="speaking-dot"></div>
-                        <span class="letter-header">${letterText}</span>
-                        <span class="target-word" style="font-size: ${fontSize}">${item.w}</span>
-                    `;
-                    
-                    card.onclick = () => {
-                        handleCardClick(card, item.l, item.w);
-                    };
+                    card.innerHTML = `<div class="speaking-dot"></div><span class="letter-header">${isSentence ? "" : item.l + item.l.toLowerCase()}</span><span class="target-word" style="font-size: ${isSentence ? '1.7rem' : '2.4rem'}">${item.w}</span>`;
+                    card.onclick = () => speakPhrase(card, isSentence ? item.w : `${item.l}... ${item.w}`, isSentence ? 0.7 : 0.85);
                 }
                 grid.appendChild(card);
             });
@@ -202,39 +174,34 @@
             let wordHtml = `<div class="blend-display">`;
             chars.forEach((c, i) => wordHtml += `<span id="char-${word}-${i}">${c}</span>`);
             wordHtml += `</div>`;
-
-            card.innerHTML = `
-                <div class="speaking-dot"></div>
-                ${wordHtml}
-                <div class="slider-container">
-                    <input type="range" min="0" max="${chars.length}" value="0" oninput="handleBlend(this, '${word}', this.parentElement.parentElement)">
-                </div>
-                <p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>
-            `;
+            card.innerHTML = `<div class="speaking-dot"></div>${wordHtml}<div class="slider-container"><input type="range" min="0" max="${chars.length}" value="0" oninput="handleBlend(this, '${word}', this.parentElement.parentElement)"></div><p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>`;
         }
 
-        function handleCardClick(card, letter, word) {
+        function speakPhrase(card, text, rate) {
+            // Hard Kill any current voice and clear dots
             window.speechSynthesis.cancel();
-            resetActiveCards();
-            
-            card.classList.add('active');
+            document.querySelectorAll('.speaking-dot').forEach(d => d.style.display = 'none');
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+
             const dot = card.querySelector('.speaking-dot');
+            card.classList.add('active');
             dot.style.display = 'block';
 
-            const isSentence = letter === "-";
-            const phrase = isSentence ? word : `${letter}... ${word}`;
-            
-            const msg = new SpeechSynthesisUtterance(phrase.toLowerCase());
-            msg.rate = isSentence ? 0.7 : 0.8;
-            setupVoice(msg);
+            // Safety timeout: stop the dot if voice fails to fire
+            const safety = setTimeout(() => {
+                dot.style.display = 'none';
+                card.classList.remove('active');
+            }, 4000);
 
+            const msg = new SpeechSynthesisUtterance(text.toLowerCase());
+            msg.rate = rate;
             msg.onend = () => {
+                clearTimeout(safety);
+                dot.style.display = 'none';
+                card.classList.remove('active');
                 stars++;
                 document.getElementById('star-count').innerText = stars;
-                dot.style.display = 'none';
-                setTimeout(() => card.classList.remove('active'), 400);
             };
-            
             window.speechSynthesis.speak(msg);
         }
 
@@ -243,55 +210,31 @@
             const val = parseInt(slider.value);
             const chars = word.split('');
             const dot = card.querySelector('.speaking-dot');
-
             chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = '');
 
             if (val > 0) {
                 const index = val - 1;
                 document.getElementById(`char-${word}-${index}`).className = 'char-active';
                 dot.style.display = 'block';
-
-                if (val === chars.length) {
-                    // Final word sweep
-                    const msg = new SpeechSynthesisUtterance(word.toLowerCase());
-                    msg.rate = 0.7;
-                    setupVoice(msg);
-                    msg.onend = () => {
+                
+                const isFinal = val === chars.length;
+                const msg = new SpeechSynthesisUtterance(isFinal ? word.toLowerCase() : chars[index].toLowerCase());
+                msg.rate = isFinal ? 0.7 : 1.1;
+                msg.onend = () => {
+                    dot.style.display = 'none';
+                    if(isFinal) {
                         stars += 2;
                         document.getElementById('star-count').innerText = stars;
-                        dot.style.display = 'none';
                         setTimeout(() => {
                             slider.value = 0;
                             chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = '');
                         }, 1000);
-                    };
-                    window.speechSynthesis.speak(msg);
-                } else {
-                    // Individual sounds
-                    const msg = new SpeechSynthesisUtterance(chars[index].toLowerCase());
-                    msg.rate = 1.1;
-                    setupVoice(msg);
-                    msg.onend = () => { dot.style.display = 'none'; };
-                    window.speechSynthesis.speak(msg);
-                }
+                    }
+                };
+                window.speechSynthesis.speak(msg);
             } else {
                 dot.style.display = 'none';
             }
-        }
-
-        function setupVoice(msg) {
-            const voices = window.speechSynthesis.getVoices();
-            // Prioritize a natural US English voice
-            msg.voice = voices.find(v => v.name.includes('Google') && v.lang.includes('en-US')) || 
-                        voices.find(v => v.lang.includes('en-US')) || 
-                        voices[0];
-        }
-
-        function resetActiveCards() {
-            document.querySelectorAll('.card').forEach(c => {
-                c.classList.remove('active');
-                if(c.querySelector('.speaking-dot')) c.querySelector('.speaking-dot').style.display = 'none';
-            });
         }
 
         window.onload = () => loadLevel('l1', document.querySelector('.level-btn'));
