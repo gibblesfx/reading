@@ -15,7 +15,7 @@
             margin: 0;
         }
 
-        h1 { color: #ff4757; font-size: 2.8rem; margin: 10px 0; }
+        h1 { color: #ff4757; font-size: 2.8rem; margin: 10px 0; text-shadow: 2px 2px #fff; }
         
         .nav-container {
             margin: 20px auto;
@@ -28,49 +28,94 @@
 
         .level-btn {
             padding: 10px 16px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             border: 3px solid #1e90ff;
             border-radius: 50px;
             cursor: pointer;
             background: white;
             color: #1e90ff;
             font-weight: bold;
+            transition: all 0.3s ease;
         }
 
-        .level-btn.active { background: #1e90ff; color: white; }
-        .level-btn.blend-mode.active { background: #ffa502; border-color: #ffa502; }
+        .level-btn.active {
+            background: #1e90ff;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(30, 144, 255, 0.4);
+        }
+
         .level-btn.red-mode.active { background: #ff4757; border-color: #ff4757; }
+        .level-btn.blend-mode.active { background: #ffa502; border-color: #ffa502; }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
-            gap: 20px;
+            gap: 25px;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px 20px 120px 20px;
+            padding: 20px 20px 140px 20px;
         }
 
+        /* RESTORED HOVER & TILT EFFECTS */
         .card {
             background: white;
             border: 5px solid #1e90ff;
             border-radius: 25px;
             padding: 20px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 8px 15px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 220px;
-            cursor: pointer;
+            overflow: hidden;
         }
 
-        .card.active { border-color: #2ed573; background-color: #f0fff4; }
+        .card:hover {
+            transform: translateY(-10px) rotate(2deg);
+            border-color: #ffa502;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .card.active {
+            border-color: #2ed573 !important;
+            background-color: #f0fff4;
+            transform: scale(1.05);
+        }
+
+        /* RESTORED RED INDICATOR DOT */
+        .speaking-dot {
+            display: none;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 20px;
+            height: 20px;
+            background-color: #ff4757;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        .letter-header { font-size: 3.2rem; color: #1e90ff; font-weight: bold; margin-bottom: 5px; line-height: 1; }
+        .target-word { font-weight: bold; color: #2f3542; line-height: 1.2; }
+        
+        .card.red-word { border-color: #ff4757; }
+        .card.red-word .letter-header { color: #ff4757; }
 
         .blend-display { font-size: 4rem; letter-spacing: 15px; margin-bottom: 20px; font-weight: bold; }
         .char-active { color: #ffa502; transform: scale(1.2); display: inline-block; }
 
         .slider-container { width: 90%; margin-top: 15px; }
-        input[type=range] { width: 100%; cursor: pointer; height: 15px; }
+        input[type=range] { width: 100%; cursor: pointer; height: 20px; }
 
         .footer-score {
             position: fixed;
@@ -80,15 +125,11 @@
             background: white;
             padding: 15px;
             box-shadow: 0 -5px 15px rgba(0,0,0,0.08);
-            font-size: 2rem;
+            font-size: 2.2rem;
             color: #ffa502;
             font-weight: bold;
+            z-index: 100;
         }
-
-        .letter-header { font-size: 3rem; color: #1e90ff; font-weight: bold; margin-bottom: 10px; }
-        .target-word { font-weight: bold; color: #2f3542; }
-        .card.red-word { border-color: #ff4757; }
-        .card.red-word .letter-header { color: #ff4757; }
     </style>
 </head>
 <body>
@@ -123,21 +164,6 @@
 
         let stars = 0;
 
-        function safeSpeak(text, rate = 0.8, onEndCallback = null) {
-            // CRITICAL: Hard Reset the speech engine
-            window.speechSynthesis.cancel();
-            
-            const msg = new SpeechSynthesisUtterance(text.toLowerCase());
-            msg.rate = rate;
-            msg.pitch = 1.1;
-
-            const voices = window.speechSynthesis.getVoices();
-            msg.voice = voices.find(v => v.name.includes('Google') && v.lang.includes('en')) || voices[0];
-
-            if (onEndCallback) msg.onend = onEndCallback;
-            window.speechSynthesis.speak(msg);
-        }
-
         function loadLevel(levelId, btn) {
             window.speechSynthesis.cancel();
             document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
@@ -154,19 +180,17 @@
                     createBlendCard(card, item.w);
                 } else {
                     const isSentence = item.l === "-";
+                    const letterText = isSentence ? "" : item.l + item.l.toLowerCase();
+                    const fontSize = isSentence ? "1.7rem" : "2.4rem";
+                    
                     card.innerHTML = `
-                        <span class="letter-header">${isSentence ? "" : item.l + item.l.toLowerCase()}</span>
-                        <span class="target-word" style="font-size: ${isSentence ? "1.6rem" : "2rem"}">${item.w}</span>
+                        <div class="speaking-dot"></div>
+                        <span class="letter-header">${letterText}</span>
+                        <span class="target-word" style="font-size: ${fontSize}">${item.w}</span>
                     `;
+                    
                     card.onclick = () => {
-                        resetUI();
-                        card.classList.add('active');
-                        const phrase = isSentence ? item.w : `${item.l}... ${item.w}`;
-                        safeSpeak(phrase, isSentence ? 0.7 : 0.8, () => {
-                            stars++;
-                            document.getElementById('star-count').innerText = stars;
-                            setTimeout(() => card.classList.remove('active'), 500);
-                        });
+                        handleCardClick(card, item.l, item.w);
                     };
                 }
                 grid.appendChild(card);
@@ -179,39 +203,98 @@
             chars.forEach((c, i) => wordHtml += `<span id="char-${word}-${i}">${c}</span>`);
             wordHtml += `</div>`;
 
-            card.innerHTML = `${wordHtml}
-                <div class="slider-container"><input type="range" min="0" max="${chars.length}" value="0" oninput="handleBlend(this, '${word}')"></div>
-                <p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>`;
+            card.innerHTML = `
+                <div class="speaking-dot"></div>
+                ${wordHtml}
+                <div class="slider-container">
+                    <input type="range" min="0" max="${chars.length}" value="0" oninput="handleBlend(this, '${word}', this.parentElement.parentElement)">
+                </div>
+                <p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>
+            `;
         }
 
-        function handleBlend(slider, word) {
+        function handleCardClick(card, letter, word) {
+            window.speechSynthesis.cancel();
+            resetActiveCards();
+            
+            card.classList.add('active');
+            const dot = card.querySelector('.speaking-dot');
+            dot.style.display = 'block';
+
+            const isSentence = letter === "-";
+            const phrase = isSentence ? word : `${letter}... ${word}`;
+            
+            const msg = new SpeechSynthesisUtterance(phrase.toLowerCase());
+            msg.rate = isSentence ? 0.7 : 0.8;
+            setupVoice(msg);
+
+            msg.onend = () => {
+                stars++;
+                document.getElementById('star-count').innerText = stars;
+                dot.style.display = 'none';
+                setTimeout(() => card.classList.remove('active'), 400);
+            };
+            
+            window.speechSynthesis.speak(msg);
+        }
+
+        function handleBlend(slider, word, card) {
+            window.speechSynthesis.cancel();
             const val = parseInt(slider.value);
             const chars = word.split('');
+            const dot = card.querySelector('.speaking-dot');
+
             chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = '');
 
             if (val > 0) {
                 const index = val - 1;
                 document.getElementById(`char-${word}-${index}`).className = 'char-active';
-                
+                dot.style.display = 'block';
+
                 if (val === chars.length) {
-                    safeSpeak(word, 0.7, () => {
+                    // Final word sweep
+                    const msg = new SpeechSynthesisUtterance(word.toLowerCase());
+                    msg.rate = 0.7;
+                    setupVoice(msg);
+                    msg.onend = () => {
                         stars += 2;
                         document.getElementById('star-count').innerText = stars;
-                        setTimeout(() => { 
-                            slider.value = 0; 
+                        dot.style.display = 'none';
+                        setTimeout(() => {
+                            slider.value = 0;
                             chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = '');
-                        }, 1200);
-                    });
+                        }, 1000);
+                    };
+                    window.speechSynthesis.speak(msg);
                 } else {
-                    safeSpeak(chars[index], 1.1);
+                    // Individual sounds
+                    const msg = new SpeechSynthesisUtterance(chars[index].toLowerCase());
+                    msg.rate = 1.1;
+                    setupVoice(msg);
+                    msg.onend = () => { dot.style.display = 'none'; };
+                    window.speechSynthesis.speak(msg);
                 }
+            } else {
+                dot.style.display = 'none';
             }
         }
 
-        function resetUI() { document.querySelectorAll('.card').forEach(c => c.classList.remove('active')); }
+        function setupVoice(msg) {
+            const voices = window.speechSynthesis.getVoices();
+            // Prioritize a natural US English voice
+            msg.voice = voices.find(v => v.name.includes('Google') && v.lang.includes('en-US')) || 
+                        voices.find(v => v.lang.includes('en-US')) || 
+                        voices[0];
+        }
+
+        function resetActiveCards() {
+            document.querySelectorAll('.card').forEach(c => {
+                c.classList.remove('active');
+                if(c.querySelector('.speaking-dot')) c.querySelector('.speaking-dot').style.display = 'none';
+            });
+        }
 
         window.onload = () => loadLevel('l1', document.querySelector('.level-btn'));
-        // Pre-warm voices
         window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     </script>
 </body>
