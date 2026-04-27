@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reading Adventure: Mega List</title>
+    <title>Reading Stars Adventure</title>
     <style>
         body {
             font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
@@ -12,9 +12,10 @@
             padding: 20px;
             color: #2f3542;
             min-height: 100vh;
+            margin: 0;
         }
 
-        h1 { color: #ff4757; font-size: 3rem; margin-bottom: 5px; text-shadow: 2px 2px #fff; }
+        h1 { color: #ff4757; font-size: 2.8rem; margin: 10px 0; text-shadow: 2px 2px #fff; }
         
         .nav-container {
             margin: 20px auto;
@@ -22,31 +23,29 @@
             justify-content: center;
             gap: 10px;
             flex-wrap: wrap;
-            max-width: 1000px;
+            max-width: 1100px;
         }
 
         .level-btn {
-            padding: 12px 20px;
-            font-size: 1rem;
+            padding: 10px 18px;
+            font-size: 0.9rem;
             border: 3px solid #1e90ff;
             border-radius: 50px;
             cursor: pointer;
             background: white;
             color: #1e90ff;
             font-weight: bold;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .level-btn.active {
             background: #1e90ff;
             color: white;
-            box-shadow: 0 5px 15px rgba(30, 144, 255, 0.3);
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(30, 144, 255, 0.4);
         }
 
-        .level-btn.red-mode.active {
-            background: #ff4757;
-            border-color: #ff4757;
-        }
+        .level-btn.red-mode.active { background: #ff4757; border-color: #ff4757; }
 
         .grid {
             display: grid;
@@ -54,7 +53,7 @@
             gap: 15px;
             max-width: 1200px;
             margin: 0 auto;
-            padding-bottom: 100px;
+            padding: 20px 20px 120px 20px;
         }
 
         .card {
@@ -63,20 +62,49 @@
             border-radius: 25px;
             padding: 25px 10px;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
             position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-10px) rotate(-3deg);
+            border-color: #ffa502;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+        }
+
+        /* Level 4-6 Hint styling (Smaller, whole word) */
+        .word-hint {
+            font-size: 2.2rem;
+            display: block;
+            font-weight: bold;
+            color: #2f3542;
+            margin-bottom: 5px;
+        }
+
+        /* Level 1-3 Letter styling (Bigger) */
+        .letter-hint {
+            font-size: 4rem;
+            display: block;
+            font-weight: bold;
+            color: #2f3542;
+        }
+
+        .word {
+            font-size: 1.5rem;
+            color: #2ed573;
+            font-weight: bold;
+            display: block;
+            opacity: 0;
+            transition: all 0.3s;
         }
 
         .card.red-word { border-color: #ff4757; }
         .card.red-word .word { color: #ff4757; }
 
-        .letter-hint { font-size: 3.5rem; display: block; font-weight: bold; color: #2f3542; }
-        .word { font-size: 1.6rem; color: #2ed573; font-weight: bold; display: block; opacity: 0; }
-
-        .card.active { border-color: #ffa502; background-color: #fffaf0; transform: scale(1.05); }
+        .card.active { border-color: #2ed573; background-color: #f0fff4; transform: scale(1.05) rotate(0deg) !important; }
         .card.active .word { opacity: 1; }
-        .card.active .letter-hint { color: #ced6e0; }
+        .card.active .letter-hint, .card.active .word-hint { color: #ced6e0; }
 
         .speaking-ring {
             display: none;
@@ -92,16 +120,18 @@
 
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
 
-        .footer-stats {
+        .footer-score {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             background: white;
             padding: 15px;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.08);
             font-size: 1.8rem;
             color: #ffa502;
+            font-weight: bold;
+            z-index: 100;
         }
     </style>
 </head>
@@ -110,43 +140,28 @@
     <h1>Reading Stars ⭐</h1>
     
     <div class="nav-container">
-        <button class="level-btn active" onclick="loadLevel('l1', this)">Level 1 (3 Letters)</button>
-        <button class="level-btn" onclick="loadLevel('l2', this)">Level 2 (4 Letters)</button>
-        <button class="level-btn" onclick="loadLevel('l3', this)">Level 3 (5 Letters)</button>
-        <button class="level-btn red-mode" onclick="loadLevel('red', this)">OG Red Words</button>
+        <button class="level-btn active" onclick="loadLevel('l1', this)">L1: 3-Letter</button>
+        <button class="level-btn" onclick="loadLevel('l2', this)">L2: 4-Letter</button>
+        <button class="level-btn" onclick="loadLevel('l3', this)">L3: 5-Letter</button>
+        <button class="level-btn" onclick="loadLevel('l4', this)">L4: Blends</button>
+        <button class="level-btn" onclick="loadLevel('l5', this)">L5: Digraphs</button>
+        <button class="level-btn" onclick="loadLevel('l6', this)">L6: Sentences</button>
+        <button class="level-btn red-mode" onclick="loadLevel('red', this)">Red Words</button>
     </div>
 
     <div id="game-grid" class="grid"></div>
-
-    <div class="footer-stats">Stars: <span id="star-count">0</span> 🌟</div>
+    <div class="footer-score">Stars: <span id="star-count">0</span> 🌟</div>
 
     <script>
         const wordData = {
-            l1: [
-                { w: "CAT", l: "C" }, { w: "DOG", l: "D" }, { w: "SUN", l: "S" }, { w: "BED", l: "B" },
-                { w: "PIG", l: "P" }, { w: "HAT", l: "H" }, { w: "BOX", l: "B" }, { w: "CUP", l: "C" },
-                { w: "JET", l: "J" }, { w: "MAP", l: "M" }, { w: "NET", l: "N" }, { w: "PEN", l: "P" },
-                { w: "RUN", l: "R" }, { w: "TEN", l: "T" }, { w: "WIG", l: "W" }, { w: "VAN", l: "V" }
-            ],
-            l2: [
-                { w: "FISH", l: "F" }, { w: "FROG", l: "F" }, { w: "BIRD", l: "B" }, { w: "STAR", l: "S" },
-                { w: "DUCK", l: "D" }, { w: "CAKE", l: "C" }, { w: "BOAT", l: "B" }, { w: "TREE", l: "T" },
-                { w: "MOON", l: "M" }, { w: "LAMP", l: "L" }, { w: "HAND", l: "H" }, { w: "DRUM", l: "D" },
-                { w: "FIRE", l: "F" }, { w: "KITE", l: "K" }, { w: "MILK", l: "M" }, { w: "WIND", l: "W" }
-            ],
-            l3: [
-                { w: "TRUCK", l: "T" }, { w: "APPLE", l: "A" }, { w: "GRAPE", l: "G" }, { w: "HOUSE", l: "H" },
-                { w: "SNAKE", l: "S" }, { w: "PLANE", l: "P" }, { w: "BREAD", l: "B" }, { w: "CLOCK", l: "C" },
-                { w: "DRESS", l: "D" }, { w: "GRASS", l: "G" }, { w: "HEART", l: "H" }, { w: "PHONE", l: "P" },
-                { w: "SHIRT", l: "S" }, { w: "SPOON", l: "S" }, { w: "TRAIN", l: "T" }, { w: "WATER", l: "W" }
-            ],
-            red: [
-                { w: "THE", l: "T" }, { w: "SAID", l: "S" }, { w: "WAS", l: "W" }, { w: "FOR", l: "F" },
-                { w: "ARE", l: "A" }, { w: "YOU", l: "Y" }, { w: "THEY", l: "T" }, { w: "FROM", l: "F" },
-                { w: "DOES", l: "D" }, { w: "COME", l: "C" }, { w: "WHAT", l: "W" }, { w: "WANT", l: "W" },
-                { w: "GIVE", l: "G" }, { w: "SOME", l: "S" }, { w: "BECAUSE", l: "B" }, { w: "COULD", l: "C" },
-                { w: "WHERE", l: "W" }, { w: "THERE", l: "T" }, { w: "YOUR", l: "Y" }, { w: "HERE", l: "H" }
-            ]
+            l1: [ {w:"CAT", l:"C"}, {w:"DOG", l:"D"}, {w:"SUN", l:"S"}, {w:"PIG", l:"P"}, {w:"HAT", l:"H"}, {w:"BOX", l:"B"} ],
+            l2: [ {w:"FISH", l:"F"}, {w:"STAR", l:"S"}, {w:"FROG", l:"F"}, {w:"BIRD", l:"B"}, {w:"DUCK", l:"D"}, {w:"CAKE", l:"C"} ],
+            l3: [ {w:"TRUCK", l:"T"}, {w:"APPLE", l:"A"}, {w:"GRAPE", l:"G"}, {w:"HOUSE", l:"H"}, {w:"SNAKE", l:"S"}, {w:"PLANE", l:"P"} ],
+            // Level 4-6 focus on whole word recognition (Hints are the word itself)
+            l4: [ {w:"BRUSH", type:"word"}, {w:"CLOCK", type:"word"}, {w:"DRESS", type:"word"}, {w:"DRUM", type:"word"}, {w:"GLASS", type:"word"}, {w:"SPOON", type:"word"} ],
+            l5: [ {w:"CHAIR", type:"word"}, {w:"SHEEP", type:"word"}, {w:"WHALE", type:"word"}, {w:"THUMB", type:"word"}, {w:"PHONE", type:"word"}, {w:"SHARK", type:"word"} ],
+            l6: [ {w:"BIG RED DOG", type:"word"}, {w:"THE BLUE SKY", type:"word"}, {w:"I CAN READ", type:"word"}, {w:"A FAST JEEP", type:"word"}, {w:"MY FAT CAT", type:"word"} ],
+            red: [ {w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"}, {w:"THEY", l:"T"} ]
         };
 
         let stars = 0;
@@ -160,53 +175,69 @@
             grid.innerHTML = ''; 
 
             wordData[levelId].forEach(item => {
+                const isWordMode = item.type === "word";
                 const card = document.createElement('div');
                 card.className = 'card' + (levelId === 'red' ? ' red-word' : '');
+                
                 card.innerHTML = `
                     <div class="speaking-ring"></div>
-                    <span class="letter-hint">${item.l}</span>
-                    <span class="word">${item.w}</span>
+                    <span class="${isWordMode ? 'word-hint' : 'letter-hint'}">${isWordMode ? item.w : item.l}</span>
+                    <span class="word">${isWordMode ? 'Repeat!' : item.w}</span>
                 `;
-                card.onclick = () => speakSequenced(item.l, item.w, card);
+                
+                card.onclick = () => {
+                    if(isWordMode) speakFullWord(item.w, card);
+                    else speakSequenced(item.l, item.w, card);
+                };
                 grid.appendChild(card);
             });
         }
 
+        // Voice logic for Levels 1-3 & Red Words
         function speakSequenced(letter, word, element) {
             window.speechSynthesis.cancel();
+            resetCards();
+            const msg = new SpeechSynthesisUtterance(`${letter}. ... ... ${word}`);
+            applyVoiceSettings(msg, 0.8, 1.05);
+            handleCardVisuals(msg, element);
+            window.speechSynthesis.speak(msg);
+        }
+
+        // NEW Voice logic for Levels 4-6 (Word focus)
+        function speakFullWord(word, element) {
+            window.speechSynthesis.cancel();
+            resetCards();
+            // Speeds: Slow first, then normal
+            const msg = new SpeechSynthesisUtterance(`${word}. ... ... ${word}`);
+            applyVoiceSettings(msg, 0.7, 1.05); 
+            handleCardVisuals(msg, element);
+            window.speechSynthesis.speak(msg);
+        }
+
+        function resetCards() {
             document.querySelectorAll('.card').forEach(c => {
                 c.classList.remove('active');
                 c.querySelector('.speaking-ring').style.display = 'none';
             });
+        }
 
-            const msg = new SpeechSynthesisUtterance();
-            msg.text = `${letter}. ... ... ${word}`;
-            msg.rate = 0.8; 
-            msg.pitch = 1.05; 
-            
+        function applyVoiceSettings(msg, rate, pitch) {
+            msg.rate = rate;
+            msg.pitch = pitch;
             const voices = window.speechSynthesis.getVoices();
-            const bestVoice = voices.find(v => v.name.includes('Google US English')) || 
-                              voices.find(v => v.name.includes('Natural')) ||
-                              voices[0];
-            if (bestVoice) msg.voice = bestVoice;
+            msg.voice = voices.find(v => v.name.includes('Google US English')) || voices.find(v => v.name.includes('Natural')) || voices[0];
+        }
 
+        function handleCardVisuals(msg, element) {
             element.classList.add('active');
             const ring = element.querySelector('.speaking-ring');
             ring.style.display = 'block';
-
             msg.onend = () => {
-                if (element.classList.contains('active')) {
-                    stars++;
-                    document.getElementById('star-count').innerText = stars;
-                    ring.style.display = 'none';
-                    setTimeout(() => {
-                        if (element.classList.contains('active')) {
-                            element.classList.remove('active');
-                        }
-                    }, 1200);
-                }
+                stars++;
+                document.getElementById('star-count').innerText = stars;
+                ring.style.display = 'none';
+                setTimeout(() => element.classList.remove('active'), 1200);
             };
-            window.speechSynthesis.speak(msg);
         }
 
         window.onload = () => loadLevel('l1', document.querySelector('.level-btn'));
