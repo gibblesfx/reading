@@ -49,7 +49,7 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 20px;
             max-width: 1200px;
             margin: 0 auto;
@@ -60,7 +60,7 @@
             background: white;
             border: 5px solid #1e90ff;
             border-radius: 25px;
-            padding: 30px 10px;
+            padding: 20px 10px;
             cursor: pointer;
             position: relative;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -68,25 +68,44 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
             min-height: 160px;
+            overflow: hidden; /* Prevents text bleeding out */
         }
 
         .card:hover {
-            transform: translateY(-12px) rotate(-3deg);
+            transform: translateY(-12px) rotate(-2deg);
             border-color: #ffa502;
             box-shadow: 0 15px 30px rgba(0,0,0,0.1);
         }
 
-        .letter-hint { font-size: 4.5rem; display: block; font-weight: bold; color: #2f3542; }
-        .word-hint { font-size: 2rem; display: block; font-weight: bold; color: #2f3542; word-wrap: break-word; }
-        .word-label { font-size: 1.5rem; color: #2ed573; font-weight: bold; display: block; opacity: 0; transition: 0.3s; margin-top: 5px; }
+        /* Base styles for hints */
+        .hint-text {
+            display: block;
+            font-weight: bold;
+            color: #2f3542;
+            white-space: nowrap; /* Forces text to stay on one line */
+            width: 90%;
+            transition: color 0.3s;
+        }
+
+        .word-label { 
+            font-size: 1.4rem; 
+            color: #2ed573; 
+            font-weight: bold; 
+            display: block; 
+            opacity: 0; 
+            transition: 0.3s; 
+            margin-top: 10px;
+            white-space: nowrap;
+        }
 
         .card.red-word { border-color: #ff4757; }
         .card.red-word .word-label { color: #ff4757; }
 
         .card.active { border-color: #2ed573; background-color: #f0fff4; transform: scale(1.05) rotate(0deg) !important; }
         .card.active .word-label { opacity: 1; }
-        .card.active .letter-hint, .card.active .word-hint { color: #ced6e0; }
+        .card.active .hint-text { color: #ced6e0; }
 
         .speaking-ring {
             display: none;
@@ -100,7 +119,7 @@
             animation: pulse 1s infinite;
         }
 
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
 
         .footer-score {
             position: fixed;
@@ -122,11 +141,11 @@
     <h1>Reading Stars ⭐</h1>
     
     <div class="nav-container">
-        <button class="level-btn active" onclick="loadLevel('l1', this)">L1: 3 Letters</button>
-        <button class="level-btn" onclick="loadLevel('l2', this)">L2: 4 Letters</button>
-        <button class="level-btn" onclick="loadLevel('l3', this)">L3: 5 Letters</button>
-        <button class="level-btn" onclick="loadLevel('l4', this)">L4: Mix Words</button>
-        <button class="level-btn" onclick="loadLevel('l5', this)">L5: Long Words</button>
+        <button class="level-btn active" onclick="loadLevel('l1', this)">L1: A-Z (3)</button>
+        <button class="level-btn" onclick="loadLevel('l2', this)">L2: A-Z (4)</button>
+        <button class="level-btn" onclick="loadLevel('l3', this)">L3: A-Z (5)</button>
+        <button class="level-btn" onclick="loadLevel('l4', this)">L4: Words</button>
+        <button class="level-btn" onclick="loadLevel('l5', this)">L5: Big Words</button>
         <button class="level-btn" onclick="loadLevel('l6', this)">L6: Sentences</button>
         <button class="level-btn red-mode" onclick="loadLevel('red', this)">Red Words</button>
     </div>
@@ -136,44 +155,25 @@
 
     <script>
         const wordData = {
-            l1: [
-                {w:"CAT", l:"C"}, {w:"DOG", l:"D"}, {w:"SUN", l:"S"}, {w:"PIG", l:"P"}, {w:"HAT", l:"H"},
-                {w:"BOX", l:"B"}, {w:"JAM", l:"J"}, {w:"MOP", l:"M"}, {w:"BED", l:"B"}, {w:"CUP", l:"C"},
-                {w:"JET", l:"J"}, {w:"NET", l:"N"}, {w:"PEN", l:"P"}, {w:"VAN", l:"V"}, {w:"WIG", l:"W"}
-            ],
-            l2: [
-                {w:"FISH", l:"F"}, {w:"STAR", l:"S"}, {w:"FROG", l:"F"}, {w:"BIRD", l:"B"}, {w:"DUCK", l:"D"},
-                {w:"CAKE", l:"C"}, {w:"TREE", l:"T"}, {w:"MOON", l:"M"}, {w:"BOAT", l:"B"}, {w:"LAMP", l:"L"},
-                {w:"HAND", l:"H"}, {w:"DRUM", l:"D"}, {w:"KITE", l:"K"}, {w:"MILK", l:"M"}, {w:"WIND", l:"W"}
-            ],
-            l3: [
-                {w:"TRUCK", l:"T"}, {w:"APPLE", l:"A"}, {w:"GRAPE", l:"G"}, {w:"HOUSE", l:"H"}, {w:"SNAKE", l:"S"},
-                {w:"PLANE", l:"P"}, {w:"CLOCK", l:"C"}, {w:"BREAD", l:"B"}, {w:"TRAIN", l:"T"}, {w:"SPOON", l:"S"},
-                {w:"DRESS", l:"D"}, {w:"HEART", l:"H"}, {w:"PHONE", l:"P"}, {w:"WATER", l:"W"}, {w:"SHIRT", l:"S"}
-            ],
-            l4: [
-                {w:"BRUSH", m:"word"}, {w:"SMILE", m:"word"}, {w:"PLANT", m:"word"}, {w:"STAMP", m:"word"},
-                {w:"SWIM", m:"word"}, {w:"GLASS", m:"word"}, {w:"TRASH", m:"word"}, {w:"CRAB", m:"word"},
-                {w:"FLIP", m:"word"}, {w:"DRIP", m:"word"}, {w:"SKIP", m:"word"}, {w:"FROG", m:"word"}
-            ],
-            l5: [
-                {w:"GIRAFFE", m:"word"}, {w:"ELEPHANT", m:"word"}, {w:"RAINBOW", m:"word"}, {w:"OCTOPUS", m:"word"},
-                {w:"CHICKEN", m:"word"}, {w:"FLOWER", m:"word"}, {w:"DINOSAUR", m:"word"}, {w:"BUTTERFLY", m:"word"},
-                {w:"HAMBURGER", m:"word"}, {w:"UMBRELLA", m:"word"}, {w:"COMPUTER", m:"word"}
-            ],
-            l6: [
-                {w:"I LIKE DOGS", m:"word"}, {w:"THE BIG SUN", m:"word"}, {w:"A RED CAT", m:"word"},
-                {w:"SEE THE FISH", m:"word"}, {w:"GO TO BED", m:"word"}, {w:"MY FAST JEEP", m:"word"},
-                {w:"I CAN READ", m:"word"}, {w:"THE BLUE SKY", m:"word"}, {w:"A PINK PIG", m:"word"}
-            ],
-            red: [
-                {w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"},
-                {w:"THEY", l:"T"}, {w:"FROM", l:"F"}, {w:"DOES", l:"D"}, {w:"WHAT", l:"W"}, {w:"WANT", l:"W"},
-                {w:"GIVE", l:"G"}, {w:"SOME", l:"S"}, {w:"BECAUSE", l:"B"}, {w:"COULD", l:"C"}, {w:"YOUR", l:"Y"}
-            ]
+            l1: [{w:"ANT", l:"A"}, {w:"BAT", l:"B"}, {w:"CAT", l:"C"}, {w:"DOG", l:"D"}, {w:"EGG", l:"E"}, {w:"FAN", l:"F"}, {w:"GUM", l:"G"}, {w:"HAT", l:"H"}, {w:"INK", l:"I"}, {w:"JAM", l:"J"}, {w:"KIT", l:"K"}, {w:"LOG", l:"L"}, {w:"MAP", l:"M"}, {w:"NET", l:"N"}, {w:"OWL", l:"O"}, {w:"PIG", l:"P"}, {w:"QUI", l:"Q"}, {w:"RUN", l:"R"}, {w:"SUN", l:"S"}, {w:"TEN", l:"T"}, {w:"UP!", l:"U"}, {w:"VAN", l:"V"}, {w:"WIG", l:"W"}, {w:"SIX", l:"X"}, {w:"YAK", l:"Y"}, {w:"ZAP", l:"Z"}],
+            l2: [{w:"ATOM", l:"A"}, {w:"BIRD", l:"B"}, {w:"CAKE", l:"C"}, {w:"DUCK", l:"D"}, {w:"EAST", l:"E"}, {w:"FISH", l:"F"}, {w:"GATE", l:"G"}, {w:"HAND", l:"H"}, {w:"IRON", l:"I"}, {w:"JEEP", l:"J"}, {w:"KITE", l:"K"}, {w:"LAMP", l:"L"}, {w:"MOON", l:"M"}, {w:"NEST", l:"N"}, {w:"OPEN", l:"O"}, {w:"PINK", l:"P"}, {w:"QUIT", l:"Q"}, {w:"RAIN", l:"R"}, {w:"STAR", l:"S"}, {w:"TREE", l:"T"}, {w:"UNIT", l:"U"}, {w:"VEST", l:"V"}, {w:"WIND", l:"W"}, {w:"EXIT", l:"X"}, {w:"YELL", l:"Y"}, {w:"ZOOM", l:"Z"}],
+            l3: [{w:"APPLE", l:"A"}, {w:"BREAD", l:"B"}, {w:"CLOCK", l:"C"}, {w:"DRESS", l:"D"}, {w:"EAGLE", l:"E"}, {w:"FRUIT", l:"F"}, {w:"GRAPE", l:"G"}, {w:"HOUSE", l:"H"}, {w:"IGLOO", l:"I"}, {w:"JELLY", l:"J"}, {w:"KOALA", l:"K"}, {w:"LEMON", l:"L"}, {w:"MOUSE", l:"M"}, {w:"NIGHT", l:"N"}, {w:"OCEAN", l:"O"}, {w:"PLANE", l:"P"}, {w:"QUEEN", l:"Q"}, {w:"ROBOT", l:"R"}, {w:"SNAKE", l:"S"}, {w:"TRAIN", l:"T"}, {w:"UNCLE", l:"U"}, {w:"VOICE", l:"V"}, {w:"WATER", l:"W"}, {w:"XYLO", l:"X"}, {w:"YOUNG", l:"Y"}, {w:"ZEBRA", l:"Z"}],
+            l4: [{w:"BRUSH", m:"word"}, {w:"SMILE", m:"word"}, {w:"PLANT", m:"word"}, {w:"STAMP", m:"word"}, {w:"SWIM", m:"word"}, {w:"GLASS", m:"word"}, {w:"TRASH", m:"word"}, {w:"CRAB", m:"word"}, {w:"FLIP", m:"word"}, {w:"DRIP", m:"word"}, {w:"SKIP", m:"word"}, {w:"STOP", m:"word"}],
+            l5: [{w:"GIRAFFE", m:"word"}, {w:"ELEPHANT", m:"word"}, {w:"RAINBOW", m:"word"}, {w:"OCTOPUS", m:"word"}, {w:"CHICKEN", m:"word"}, {w:"FLOWER", m:"word"}, {w:"DINOSAUR", m:"word"}, {w:"BUTTERFLY", m:"word"}, {w:"HAMBURGER", m:"word"}, {w:"UMBRELLA", m:"word"}, {w:"COMPUTER", m:"word"}, {w:"SQUIRREL", m:"word"}],
+            l6: [{w:"I LIKE DOGS", m:"word"}, {w:"THE BIG SUN", m:"word"}, {w:"A RED CAT", m:"word"}, {w:"SEE THE FISH", m:"word"}, {w:"GO TO BED", m:"word"}, {w:"MY FAST JEEP", m:"word"}, {w:"I CAN READ", m:"word"}, {w:"THE BLUE SKY", m:"word"}, {w:"A GREEN TREE", m:"word"}],
+            red: [{w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"}, {w:"THEY", l:"T"}, {w:"FROM", l:"F"}, {w:"DOES", l:"D"}, {w:"WHAT", l:"W"}, {w:"WANT", l:"W"}, {w:"GIVE", l:"G"}, {w:"SOME", l:"S"}, {w:"BECAUSE", l:"B"}, {w:"COULD", l:"C"}, {w:"YOUR", l:"Y"}]
         };
 
         let stars = 0;
+
+        function getFontSize(text, isWordMode) {
+            const len = text.length;
+            if (!isWordMode) return "4.5rem"; // Large for single letters
+            if (len <= 5) return "2.5rem";
+            if (len <= 8) return "2rem";
+            if (len <= 12) return "1.5rem";
+            return "1.2rem"; // Smallest for long sentences
+        }
 
         function loadLevel(levelId, btn) {
             window.speechSynthesis.cancel();
@@ -185,13 +185,16 @@
 
             wordData[levelId].forEach(item => {
                 const isWordMode = item.m === "word";
+                const displayValue = isWordMode ? item.w : item.l;
+                const fontSize = getFontSize(displayValue, isWordMode);
+                
                 const card = document.createElement('div');
                 card.className = 'card' + (levelId === 'red' ? ' red-word' : '');
                 
                 card.innerHTML = `
                     <div class="speaking-ring"></div>
-                    <span class="${isWordMode ? 'word-hint' : 'letter-hint'}">${isWordMode ? item.w : item.l}</span>
-                    <span class="word-label">${isWordMode ? 'Good!' : item.w}</span>
+                    <span class="hint-text" style="font-size: ${fontSize}">${displayValue}</span>
+                    <span class="word-label">${isWordMode ? 'Star!' : item.w}</span>
                 `;
                 
                 card.onclick = () => {
