@@ -13,30 +13,34 @@
             color: #333;
         }
 
+        h1 { color: #ff4757; font-size: 3rem; text-shadow: 2px 2px white; }
+
         /* Level Navigation */
         .nav-container {
             margin-bottom: 30px;
             display: flex;
             justify-content: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .level-btn {
-            padding: 15px 30px;
-            font-size: 1.2rem;
+            padding: 12px 25px;
+            font-size: 1.1rem;
             border: none;
             border-radius: 50px;
             cursor: pointer;
             background: white;
-            border: 3px solid #ddd;
+            border: 3px solid #1e90ff;
+            color: #1e90ff;
+            font-weight: bold;
             transition: 0.3s;
         }
 
         .level-btn.active {
-            background: #ff4757;
+            background: #1e90ff;
             color: white;
-            border-color: #ff4757;
-            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+            box-shadow: 0 5px 15px rgba(30, 144, 255, 0.4);
         }
 
         .grid {
@@ -49,44 +53,47 @@
 
         .card {
             background: white;
-            border: 5px solid #1e90ff;
+            border: 5px solid #2ed573;
             border-radius: 25px;
-            padding: 25px 10px;
+            padding: 30px 10px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s ease;
             box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            position: relative;
         }
 
-        .card:hover { transform: scale(1.05); }
+        .card:hover { transform: translateY(-5px); border-color: #ffa502; }
 
         .letter-hint {
-            font-size: 1.5rem;
-            color: #1e90ff;
+            font-size: 4rem;
+            color: #2f3542;
             display: block;
-            margin-bottom: 5px;
             font-weight: bold;
         }
 
         .word {
-            font-size: 2.5rem;
-            display: block;
+            font-size: 1.8rem;
+            color: #ff4757;
             font-weight: bold;
-            letter-spacing: 2px;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        .hidden-word { visibility: hidden; }
-        .card.active .hidden-word { visibility: visible; }
+        .card.active .word { opacity: 1; }
+        .card.active .letter-hint { color: #ccc; }
 
         .star-score {
             font-size: 2rem;
-            margin-top: 30px;
+            margin-top: 40px;
             color: #ffa502;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <h1 style="color: #2ed573; font-size: 3rem;">Reading Stars ⭐</h1>
+    <h1>Reading Adventure ⭐</h1>
     
     <div class="nav-container">
         <button class="level-btn active" onclick="loadLevel(1, this)">Level 1 (3 Letters)</button>
@@ -94,87 +101,86 @@
         <button class="level-btn" onclick="loadLevel(3, this)">Level 3 (5 Letters)</button>
     </div>
 
-    <div id="game-grid" class="grid">
-        </div>
+    <div id="game-grid" class="grid"></div>
 
-    <div class="star-score">Stars: <span id="star-count">0</span> ⭐</div>
+    <div class="star-score">Stars: <span id="star-count">0</span> 🌟</div>
 
     <script>
         const levels = {
             1: [
-                { word: "CAT", hint: "C" }, { word: "DOG", hint: "D" },
-                { word: "SUN", hint: "S" }, { word: "BED", hint: "B" },
-                { word: "PIG", hint: "P" }, { word: "HAT", hint: "H" }
+                { word: "CAT", letter: "C" }, { word: "DOG", letter: "D" },
+                { word: "SUN", letter: "S" }, { word: "BED", letter: "B" },
+                { word: "PIG", letter: "P" }, { word: "HAT", letter: "H" }
             ],
             2: [
-                { word: "FISH", hint: "F" }, { word: "FROG", hint: "F" },
-                { word: "BIRD", hint: "B" }, { word: "STAR", hint: "S" },
-                { word: "DUCK", hint: "D" }, { word: "CAKE", hint: "C" }
+                { word: "FISH", letter: "F" }, { word: "FROG", letter: "F" },
+                { word: "BIRD", letter: "B" }, { word: "STAR", letter: "S" },
+                { word: "DUCK", letter: "D" }, { word: "CAKE", letter: "C" }
             ],
             3: [
-                { word: "TRUCK", hint: "T" }, { word: "APPLE", hint: "A" },
-                { word: "GRAPE", hint: "G" }, { word: "HOUSE", hint: "H" },
-                { word: "SNAKE", hint: "S" }, { word: "PLANE", hint: "P" }
+                { word: "TRUCK", letter: "T" }, { word: "APPLE", letter: "A" },
+                { word: "GRAPE", letter: "G" }, { word: "HOUSE", letter: "H" },
+                { word: "SNAKE", letter: "S" }, { word: "PLANE", letter: "P" }
             ]
         };
 
         let stars = 0;
 
         function loadLevel(levelNum, btn) {
-            // Update buttons
             document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
             const grid = document.getElementById('game-grid');
-            grid.innerHTML = ''; // Clear current cards
+            grid.innerHTML = ''; 
 
             levels[levelNum].forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <span class="letter-hint">${item.hint}</span>
-                    <span class="word hidden-word">${item.word}</span>
+                    <span class="letter-hint">${item.letter}</span>
+                    <span class="word">${item.word}</span>
                 `;
-                card.onclick = () => speakWord(item.word, card);
+                card.onclick = () => speakSequenced(item.letter, item.word, card);
                 grid.appendChild(card);
             });
         }
 
-        function speakWord(word, element) {
+        function speakSequenced(letter, word, element) {
             window.speechSynthesis.cancel();
             
             const msg = new SpeechSynthesisUtterance();
             
-            // Phonetic spelling: speaks the word slowly
-            msg.text = word;
-            msg.rate = 0.6; 
-            msg.pitch = 1.2;
-
-            // Voice Selection
+            // The "Better Voice" Logic: Letter + Pause + Word
+            msg.text = `${letter}. ... ... ${word}`;
+            
+            msg.rate = 0.7;  // Slow and clear
+            msg.pitch = 1.2; // Cheerful pitch
+            
+            // Voice selection
             const voices = window.speechSynthesis.getVoices();
-            msg.voice = voices.find(v => v.name.includes('Google') || v.name.includes('Natural')) || voices[0];
+            const bestVoice = voices.find(v => v.name.includes('Google US English')) || 
+                              voices.find(v => v.name.includes('Natural')) ||
+                              voices[0];
+            if (bestVoice) msg.voice = bestVoice;
 
             element.classList.add('active');
             
             msg.onend = () => {
-                // Give a star if this is the first time clicking it (optional logic)
                 stars++;
                 document.getElementById('star-count').innerText = stars;
-                
                 setTimeout(() => {
                     element.classList.remove('active');
-                }, 1500);
+                }, 1000);
             };
 
             window.speechSynthesis.speak(msg);
         }
 
-        // Initialize Level 1 on load
         window.onload = () => {
             loadLevel(1, document.querySelector('.level-btn'));
         };
 
-        // Warm up voices
+        // Pre-load voices for the browser
         window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     </script>
 </body>
