@@ -100,10 +100,10 @@
         .card.red-word .letter-header { color: #ff4757; }
 
         .blend-display { font-size: 4rem; letter-spacing: 15px; margin-bottom: 20px; font-weight: bold; }
-        .char-active { color: #ffa502; transform: scale(1.25); display: inline-block; }
+        .char-active { color: #ffa502; transform: scale(1.35); display: inline-block; transition: all 0.1s ease; }
 
         .slider-container { width: 90%; margin-top: 15px; }
-        input[type=range] { width: 100%; cursor: pointer; height: 25px; }
+        input[type=range] { width: 100%; cursor: pointer; height: 35px; }
 
         .footer-score {
             position: fixed;
@@ -176,8 +176,26 @@
                 const card = document.createElement('div');
                 card.className = 'card' + (levelId === 'red' ? ' red-word' : '');
                 if(levelId === 'blend') {
-                    createBlendCard(card, item);
+                    // Blend Card Template
+                    const word = item.w;
+                    const chars = word.split('');
+                    let wordHtml = `<div class="blend-display">`;
+                    chars.forEach((c, i) => wordHtml += `<span id="char-${word}-${i}">${c}</span>`);
+                    wordHtml += `</div>`;
+                    
+                    card.innerHTML = `
+                        <div class="speaking-dot"></div>
+                        ${wordHtml}
+                        <div class="slider-container">
+                            <input type="range" min="0" max="${chars.length + 1}" value="0" 
+                            oninput="handleBlend(this, '${word}', this.parentElement.parentElement)">
+                        </div>
+                        <p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>`;
+                    
+                    // Store phonetics on the element directly to avoid stringify issues
+                    card.dataset.phonetics = JSON.stringify(item.p);
                 } else {
+                    // Standard Card Template
                     const isSentence = item.l === "-";
                     card.innerHTML = `<div class="speaking-dot"></div><span class="letter-header">${isSentence ? "" : item.l + item.l.toLowerCase()}</span><span class="target-word" style="font-size: ${isSentence ? '1.8rem' : '2.4rem'}">${item.w}</span>`;
                     card.onclick = () => {
@@ -203,45 +221,39 @@
             });
         }
 
-        function createBlendCard(card, item) {
-            const word = item.w;
-            const chars = word.split('');
-            let wordHtml = `<div class="blend-display">`;
-            chars.forEach((c, i) => wordHtml += `<span id="char-${word}-${i}">${c}</span>`);
-            wordHtml += `</div>`;
-            
-            card.innerHTML = `
-                <div class="speaking-dot"></div>
-                ${wordHtml}
-                <div class="slider-container">
-                    <input type="range" min="0" max="${chars.length + 1}" value="0" 
-                    oninput="handleBlend(this, '${word}', ${JSON.stringify(item.p)}, this.parentElement.parentElement)">
-                </div>
-                <p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>`;
-        }
-
-        function handleBlend(slider, word, phonetics, card) {
+        function handleBlend(slider, word, card) {
             window.speechSynthesis.cancel();
             const val = parseInt(slider.value);
             const chars = word.split('');
             const dot = card.querySelector('.speaking-dot');
+            const phonetics = JSON.parse(card.dataset.phonetics);
             
-            chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = '');
+            // 1. Reset all letter highlights in this card
+            chars.forEach((_, i) => {
+                const el = document.getElementById(`char-${word}-${i}`);
+                if (el) el.className = '';
+            });
 
             if (val > 0) {
                 dot.style.display = 'block';
                 let msg;
 
                 if (val <= chars.length) {
-                    // Step 1-3: PHONETIC SOUNDS
+                    // Step: Individual PHONETIC SOUNDS
                     const index = val - 1;
-                    document.getElementById(`char-${word}-${index}`).className = 'char-active';
-                    msg = new SpeechSynthesisUtterance(phonetics[index]); // Uses "ah", "k", "t" etc.
-                    msg.rate = 1.0;
-                    msg.pitch = 1.2;
+                    const letterSpan = document.getElementById(`char-${word}-${index}`);
+                    if(letterSpan) letterSpan.className = 'char-active';
+                    
+                    msg = new SpeechSynthesisUtterance(phonetics[index]);
+                    msg.rate = 0.9;
+                    msg.pitch = 1.1;
                 } else {
-                    // Final Step: FULL WORD SWEEP
-                    chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = 'char-active');
+                    // Final Step: FULL WORD
+                    chars.forEach((_, i) => {
+                        const el = document.getElementById(`char-${word}-${i}`);
+                        if (el) el.className = 'char-active';
+                    });
+                    
                     msg = new SpeechSynthesisUtterance(word.toLowerCase());
                     msg.rate = 0.7;
                     msg.onend = () => {
@@ -249,9 +261,12 @@
                         document.getElementById('star-count').innerText = stars;
                         setTimeout(() => {
                             slider.value = 0;
-                            chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = '');
+                            chars.forEach((_, i) => {
+                                const el = document.getElementById(`char-${word}-${i}`);
+                                if (el) el.className = '';
+                            });
                             dot.style.display = 'none';
-                        }, 1000);
+                        }, 1200);
                     };
                 }
                 
