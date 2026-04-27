@@ -28,7 +28,7 @@
 
         .level-btn {
             padding: 10px 16px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             border: 3px solid #1e90ff;
             border-radius: 50px;
             cursor: pointer;
@@ -38,18 +38,13 @@
             transition: all 0.3s ease;
         }
 
-        .level-btn.active {
-            background: #1e90ff;
-            color: white;
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(30, 144, 255, 0.4);
-        }
-
+        .level-btn.active { background: #1e90ff; color: white; transform: scale(1.05); }
+        .level-btn.blend-mode.active { background: #ffa502; border-color: #ffa502; }
         .level-btn.red-mode.active { background: #ff4757; border-color: #ff4757; }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
             gap: 20px;
             max-width: 1200px;
             margin: 0 auto;
@@ -60,61 +55,35 @@
             background: white;
             border: 5px solid #1e90ff;
             border-radius: 25px;
-            padding: 15px 10px;
-            cursor: pointer;
+            padding: 20px;
             position: relative;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 8px 15px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 180px;
-            overflow: hidden; 
+            min-height: 200px;
         }
 
-        .card:hover {
-            transform: translateY(-8px);
-            border-color: #ffa502;
-        }
-
-        .letter-header {
-            display: block;
-            font-size: 3.2rem;
-            color: #1e90ff;
+        /* Blending Specific Styles */
+        .blend-display {
+            font-size: 4rem;
+            letter-spacing: 15px;
+            margin-bottom: 20px;
             font-weight: bold;
-            margin-bottom: 5px;
-            line-height: 1;
         }
 
-        .target-word {
-            display: block;
-            font-weight: bold;
-            color: #2f3542;
+        .char-active { color: #ffa502; transform: scale(1.2); display: inline-block; }
+
+        .slider-container {
+            width: 90%;
+            margin-top: 15px;
+        }
+
+        input[type=range] {
             width: 100%;
-            text-align: center;
-            line-height: 1.3;
+            cursor: pointer;
         }
-
-        .card.red-word .letter-header { color: #ff4757; }
-        .card.red-word { border-color: #ff4757; }
-
-        .card.active { border-color: #2ed573; background-color: #f0fff4; }
-        .card.active .target-word { color: #2ed573; }
-
-        .speaking-ring {
-            display: none;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 18px;
-            height: 18px;
-            background-color: #ff4757;
-            border-radius: 50%;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
 
         .footer-score {
             position: fixed;
@@ -129,6 +98,10 @@
             font-weight: bold;
             z-index: 100;
         }
+
+        .letter-header { font-size: 2.5rem; color: #1e90ff; font-weight: bold; }
+        .target-word { font-weight: bold; color: #2f3542; }
+        .card.red-word { border-color: #ff4757; }
     </style>
 </head>
 <body>
@@ -137,12 +110,10 @@
     
     <div class="nav-container">
         <button class="level-btn active" onclick="loadLevel('l1', this)">L1: A-Z (3)</button>
-        <button class="level-btn" onclick="loadLevel('l2', this)">L2: A-Z (4)</button>
-        <button class="level-btn" onclick="loadLevel('l3', this)">L3: A-Z (5)</button>
         <button class="level-btn" onclick="loadLevel('l4', this)">L4: Blends</button>
-        <button class="level-btn" onclick="loadLevel('l5', this)">L5: Big Words</button>
         <button class="level-btn" onclick="loadLevel('l6', this)">L6: Sentences</button>
         <button class="level-btn red-mode" onclick="loadLevel('red', this)">Red Words</button>
+        <button class="level-btn blend-mode" onclick="loadLevel('blend', this)">🌟 Blending</button>
     </div>
 
     <div id="game-grid" class="grid"></div>
@@ -150,47 +121,15 @@
 
     <script>
         const wordData = {
-            l1: [{w:"ANT", l:"A"}, {w:"BAT", l:"B"}, {w:"CAT", l:"C"}, {w:"DOG", l:"D"}, {w:"EGG", l:"E"}, {w:"FAN", l:"F"}, {w:"GUM", l:"G"}, {w:"HAT", l:"H"}, {w:"INK", l:"I"}, {w:"JAM", l:"J"}, {w:"KIT", l:"K"}, {w:"LOG", l:"L"}, {w:"MAP", l:"M"}, {w:"NET", l:"N"}, {w:"OWL", l:"O"}, {w:"PIG", l:"P"}, {w:"QUB", l:"Q"}, {w:"RUN", l:"R"}, {w:"SUN", l:"S"}, {w:"TEN", l:"T"}, {w:"UP!", l:"U"}, {w:"VAN", l:"V"}, {w:"WIG", l:"W"}, {w:"BOX", l:"X"}, {w:"YAK", l:"Y"}, {w:"ZAP", l:"Z"}],
-            l2: [{w:"ATOM", l:"A"}, {w:"BIRD", l:"B"}, {w:"CAKE", l:"C"}, {w:"DUCK", l:"D"}, {w:"EAST", l:"E"}, {w:"FISH", l:"F"}, {w:"GATE", l:"G"}, {w:"HAND", l:"H"}, {w:"IRON", l:"I"}, {w:"JEEP", l:"J"}, {w:"KITE", l:"K"}, {w:"LAMP", l:"L"}, {w:"MOON", l:"M"}, {w:"NEST", l:"N"}, {w:"OPEN", l:"O"}, {w:"PINK", l:"P"}, {w:"QUIT", l:"Q"}, {w:"RAIN", l:"R"}, {w:"STAR", l:"S"}, {w:"TREE", l:"T"}, {w:"UNIT", l:"U"}, {w:"VEST", l:"V"}, {w:"WIND", l:"W"}, {w:"EXIT", l:"X"}, {w:"YELL", l:"Y"}, {w:"ZOOM", l:"Z"}],
-            l3: [{w:"APPLE", l:"A"}, {w:"BREAD", l:"B"}, {w:"CLOCK", l:"C"}, {w:"DRESS", l:"D"}, {w:"EAGLE", l:"E"}, {w:"FRUIT", l:"F"}, {w:"GRAPE", l:"G"}, {w:"HOUSE", l:"H"}, {w:"IGLOO", l:"I"}, {w:"JELLY", l:"J"}, {w:"KOALA", l:"K"}, {w:"LEMON", l:"L"}, {w:"MOUSE", l:"M"}, {w:"NIGHT", l:"N"}, {w:"OCEAN", l:"O"}, {w:"PLANE", l:"P"}, {w:"QUEEN", l:"Q"}, {w:"ROBOT", l:"R"}, {w:"SNAKE", l:"S"}, {w:"TRAIN", l:"T"}, {w:"UNCLE", l:"U"}, {w:"VOICE", l:"V"}, {w:"WATER", l:"W"}, {w:"XYLO", l:"X"}, {w:"YOUNG", l:"Y"}, {w:"ZEBRA", l:"Z"}],
-            l4: [{w:"AXLE", l:"A"}, {w:"BLAST", l:"B"}, {w:"CRISP", l:"C"}, {w:"DRIFT", l:"D"}, {w:"ENTRY", l:"E"}, {w:"FROST", l:"F"}, {w:"GRUNT", l:"G"}, {w:"HATCH", l:"H"}, {w:"INDEX", l:"I"}, {w:"JOINT", l:"J"}, {w:"KNOCK", l:"K"}, {w:"LUNCH", l:"L"}, {w:"MARCH", l:"M"}, {w:"NORTH", l:"N"}, {w:"ORDER", l:"O"}, {w:"PLANT", l:"P"}, {w:"QUICK", l:"Q"}, {w:"ROAST", l:"R"}, {w:"SMILE", l:"S"}, {w:"TRUST", l:"T"}, {w:"UNDER", l:"U"}, {w:"VIVID", l:"V"}, {w:"WHALE", l:"W"}, {w:"X-RAY", l:"X"}, {w:"YOUTH", l:"Y"}, {w:"ZESTY", l:"Z"}],
-            l5: [{w:"AIRPLANE", l:"A"}, {w:"BUTTERFLY", l:"B"}, {w:"COMPUTER", l:"C"}, {w:"DINOSAUR", l:"D"}, {w:"ELEPHANT", l:"E"}, {w:"FLAMINGO", l:"F"}, {w:"GIRAFFE", l:"G"}, {w:"HAMBURGER", l:"H"}, {w:"INVISIBLE", l:"I"}, {w:"JELLYFISH", l:"J"}, {w:"KANGAROO", l:"K"}, {w:"LIGHTNING", l:"L"}, {w:"MOUNTAIN", l:"M"}, {w:"NOTEBOOK", l:"N"}, {w:"OCTOPUS", l:"O"}, {w:"PENGUIN", l:"P"}, {w:"QUIETLY", l:"Q"}, {w:"RAINBOW", l:"R"}, {w:"SQUIRREL", l:"S"}, {w:"TELESCOPE", l:"T"}, {w:"UMBRELLA", l:"U"}, {w:"VEGETABLE", l:"V"}, {w:"WHEELBARROW", l:"W"}, {w:"XYLOPHONE", l:"X"}, {w:"YESTERDAY", l:"Y"}, {w:"ZOOLOGIST", l:"Z"}],
-            l6: [
-                {w:"I LIKE CATS", l:"-"}, {w:"SEE THE DOG", l:"-"}, {w:"MY BIG RED HAT", l:"-"}, {w:"GO TO THE BED", l:"-"},
-                {w:"A FAST BLUE JEEP", l:"-"}, {w:"CAN YOU RUN?", l:"-"}, {w:"I SEE THE SUN", l:"-"}, {w:"THE BOX IS BIG", l:"-"},
-                {w:"LOOK AT THE PIG", l:"-"}, {w:"WE CAN PLAY", l:"-"}, {w:"THE CAT IS ON THE MAT", l:"-"}, {w:"I LIKE TO SWIM", l:"-"},
-                {w:"SEE THE GREEN TREE", l:"-"}, {w:"MY MOM IS KIND", l:"-"}, {w:"THE DUCK CAN QUACK", l:"-"}, {w:"HE HAS A TOY", l:"-"},
-                {w:"SHE SAW THE BIRD", l:"-"}, {w:"WE WENT TO THE PARK", l:"-"}, {w:"I CAN READ WORDS", l:"-"}, {w:"YOU ARE A STAR", l:"-"}
-            ],
-            red: [{w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"}, {w:"THEY", l:"T"}, {w:"FROM", l:"F"}, {w:"DOES", l:"D"}, {w:"WHAT", l:"W"}, {w:"WANT", l:"W"}, {w:"GIVE", l:"G"}, {w:"SOME", l:"S"}, {w:"BECAUSE", l:"B"}, {w:"COULD", l:"C"}, {w:"YOUR", l:"Y"}, {w:"PEOPLE", l:"P"}, {w:"THROUGH", l:"T"}, {w:"THOUGHT", l:"T"}, {w:"LAUGH", l:"L"}, {w:"WHO", l:"W"}, {w:"WERE", l:"W"}, {w:"WHERE", l:"W"}, {w:"ONCE", l:"O"}, {w:"DOOR", l:"D"}, {w:"EYE", l:"E"}]
+            l1: [{w:"ANT", l:"A"}, {w:"BAT", l:"B"}, {w:"CAT", l:"C"}, {w:"DOG", l:"D"}, {w:"SUN", l:"S"}, {w:"TEN", l:"T"}, {w:"BOX", l:"X"}],
+            l4: [{w:"BLAST", l:"B"}, {w:"CRISP", l:"C"}, {w:"FROST", l:"F"}, {w:"PLANT", l:"P"}],
+            l6: [{w:"I LIKE CATS", l:"-"}, {w:"SEE THE DOG", l:"-"}, {w:"YOU ARE A STAR", l:"-"}],
+            red: [{w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"}],
+            blend: [{w:"CAT"}, {w:"DOG"}, {w:"SUN"}, {w:"MAP"}, {w:"TEN"}, {w:"PIG"}, {w:"FOX"}]
         };
 
         let stars = 0;
-
-        function getFontSize(text, isSentence) {
-            const len = text.length;
-            if (isSentence) {
-                if (len <= 10) return "2.2rem";
-                if (len <= 15) return "1.8rem";
-                return "1.5rem";
-            }
-            if (len <= 4) return "2.8rem";
-            if (len <= 7) return "2.2rem";
-            if (len <= 10) return "1.7rem";
-            return "1.3rem"; 
-        }
-
-        function fixSpokenContent(text, isLetter) {
-            const upper = text.toUpperCase();
-            if (isLetter) {
-                if (upper === 'V') return 'Vee';
-                if (upper === 'Q') return 'Kew';
-                if (upper === 'X') return 'Ex';
-                return text;
-            }
-            if (upper === 'QUB') return 'Cube';
-            return text;
-        }
+        let currentStep = -1;
 
         function loadLevel(levelId, btn) {
             window.speechSynthesis.cancel();
@@ -201,71 +140,89 @@
             grid.innerHTML = ''; 
 
             wordData[levelId].forEach(item => {
-                const isSentence = item.l === "-";
-                const fontSize = getFontSize(item.w, isSentence);
-                const letterPair = isSentence ? "" : `${item.l}${item.l.toLowerCase()}`;
-                
                 const card = document.createElement('div');
                 card.className = 'card' + (levelId === 'red' ? ' red-word' : '');
-                
-                card.innerHTML = `
-                    <div class="speaking-ring"></div>
-                    <span class="letter-header">${letterPair}</span>
-                    <span class="target-word" style="font-size: ${fontSize}">${item.w}</span>
-                `;
-                
-                card.onclick = () => speakSequenced(item.l, item.w, card);
+
+                if(levelId === 'blend') {
+                    createBlendCard(card, item.w);
+                } else {
+                    const letterPair = (item.l === "-") ? "" : `${item.l}${item.l.toLowerCase()}`;
+                    card.innerHTML = `
+                        <span class="letter-header">${letterPair}</span>
+                        <span class="target-word" style="font-size: 2rem">${item.w}</span>
+                    `;
+                    card.onclick = () => speakBasic(item.l, item.w, card);
+                }
                 grid.appendChild(card);
             });
         }
 
-        function speakSequenced(letter, word, element) {
-            window.speechSynthesis.cancel();
-            resetUI();
-            
-            const fixedLetter = fixSpokenContent(letter, true);
-            const fixedWord = fixSpokenContent(word, false);
-            
-            const isSentence = letter === "-";
-            const phrase = isSentence ? `${fixedWord}` : `${fixedLetter}. ... ... ${fixedWord}`;
-            
-            const msg = new SpeechSynthesisUtterance(phrase);
-            
-            // Sentences read a bit slower for tracking
-            msg.rate = isSentence ? 0.7 : 0.75;
-            msg.pitch = 1.05;
-            
-            setupVoice(msg);
-            attachEvents(msg, element);
-            window.speechSynthesis.speak(msg);
-        }
-
-        function resetUI() {
-            document.querySelectorAll('.card').forEach(c => {
-                c.classList.remove('active');
-                c.querySelector('.speaking-ring').style.display = 'none';
+        function createBlendCard(card, word) {
+            const chars = word.split('');
+            let wordHtml = `<div class="blend-display" id="display-${word}">`;
+            chars.forEach((c, i) => {
+                wordHtml += `<span id="char-${word}-${i}">${c}</span>`;
             });
+            wordHtml += `</div>`;
+
+            card.innerHTML = `
+                ${wordHtml}
+                <div class="slider-container">
+                    <input type="range" min="0" max="${chars.length}" value="0" 
+                        oninput="handleBlend(this, '${word}')" 
+                        onchange="finishBlend(this, '${word}')">
+                </div>
+                <p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>
+            `;
         }
 
-        function setupVoice(msg) {
-            const voices = window.speechSynthesis.getVoices();
-            msg.voice = voices.find(v => v.name.includes('Google US English')) || voices.find(v => v.name.includes('Natural')) || voices[0];
+        function handleBlend(slider, word) {
+            window.speechSynthesis.cancel();
+            const val = parseInt(slider.value);
+            const chars = word.split('');
+            
+            // Reset colors
+            chars.forEach((_, i) => {
+                document.getElementById(`char-${word}-${i}`).className = '';
+            });
+
+            if (val > 0 && val <= chars.length) {
+                const index = val - 1;
+                const char = chars[index];
+                document.getElementById(`char-${word}-${index}`).className = 'char-active';
+                
+                // Speak individual letter sound (Phoneme)
+                const msg = new SpeechSynthesisUtterance(char);
+                msg.rate = 1.2;
+                window.speechSynthesis.speak(msg);
+            }
         }
 
-        function attachEvents(msg, element) {
-            element.classList.add('active');
-            const ring = element.querySelector('.speaking-ring');
-            ring.style.display = 'block';
+        function finishBlend(slider, word) {
+            if (parseInt(slider.value) === word.length) {
+                const msg = new SpeechSynthesisUtterance(word);
+                msg.rate = 0.8;
+                msg.onend = () => {
+                    stars += 2; // Extra stars for blending!
+                    document.getElementById('star-count').innerText = stars;
+                    setTimeout(() => { slider.value = 0; handleBlend(slider, word); }, 1000);
+                };
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
+        function speakBasic(letter, word, element) {
+            window.speechSynthesis.cancel();
+            const phrase = (letter === "-") ? word : `${letter}. ... ${word}`;
+            const msg = new SpeechSynthesisUtterance(phrase);
             msg.onend = () => {
                 stars++;
                 document.getElementById('star-count').innerText = stars;
-                ring.style.display = 'none';
-                setTimeout(() => { element.classList.remove('active'); }, 500);
             };
+            window.speechSynthesis.speak(msg);
         }
 
         window.onload = () => loadLevel('l1', document.querySelector('.level-btn'));
-        window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     </script>
 </body>
 </html>
