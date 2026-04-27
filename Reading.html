@@ -49,7 +49,6 @@
 
         .grid {
             display: grid;
-            /* Increased minimum width slightly to help long words */
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
             gap: 20px;
             max-width: 1200px;
@@ -61,7 +60,7 @@
             background: white;
             border: 5px solid #1e90ff;
             border-radius: 25px;
-            padding: 15px 5px; /* Reduced side padding to give text more room */
+            padding: 15px 5px;
             cursor: pointer;
             position: relative;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -85,7 +84,7 @@
             font-weight: bold;
             color: #2f3542;
             white-space: nowrap;
-            width: 100%; /* Use full width for centering logic */
+            width: 100%;
             text-align: center;
             transition: color 0.3s;
         }
@@ -144,8 +143,8 @@
         <button class="level-btn active" onclick="loadLevel('l1', this)">L1: A-Z (3)</button>
         <button class="level-btn" onclick="loadLevel('l2', this)">L2: A-Z (4)</button>
         <button class="level-btn" onclick="loadLevel('l3', this)">L3: A-Z (5)</button>
-        <button class="level-btn" onclick="loadLevel('l4', this)">L4: Words</button>
-        <button class="level-btn" onclick="loadLevel('l5', this)">L5: Big Words</button>
+        <button class="level-btn" onclick="loadLevel('l4', this)">L4: A-Z (Mix)</button>
+        <button class="level-btn" onclick="loadLevel('l5', this)">L5: A-Z (Big)</button>
         <button class="level-btn" onclick="loadLevel('l6', this)">L6: Sentences</button>
         <button class="level-btn red-mode" onclick="loadLevel('red', this)">Red Words</button>
     </div>
@@ -158,10 +157,32 @@
             l1: [{w:"ANT", l:"A"}, {w:"BAT", l:"B"}, {w:"CAT", l:"C"}, {w:"DOG", l:"D"}, {w:"EGG", l:"E"}, {w:"FAN", l:"F"}, {w:"GUM", l:"G"}, {w:"HAT", l:"H"}, {w:"INK", l:"I"}, {w:"JAM", l:"J"}, {w:"KIT", l:"K"}, {w:"LOG", l:"L"}, {w:"MAP", l:"M"}, {w:"NET", l:"N"}, {w:"OWL", l:"O"}, {w:"PIG", l:"P"}, {w:"QUB", l:"Q"}, {w:"RUN", l:"R"}, {w:"SUN", l:"S"}, {w:"TEN", l:"T"}, {w:"UP!", l:"U"}, {w:"VAN", l:"V"}, {w:"WIG", l:"W"}, {w:"BOX", l:"X"}, {w:"YAK", l:"Y"}, {w:"ZAP", l:"Z"}],
             l2: [{w:"ATOM", l:"A"}, {w:"BIRD", l:"B"}, {w:"CAKE", l:"C"}, {w:"DUCK", l:"D"}, {w:"EAST", l:"E"}, {w:"FISH", l:"F"}, {w:"GATE", l:"G"}, {w:"HAND", l:"H"}, {w:"IRON", l:"I"}, {w:"JEEP", l:"J"}, {w:"KITE", l:"K"}, {w:"LAMP", l:"L"}, {w:"MOON", l:"M"}, {w:"NEST", l:"N"}, {w:"OPEN", l:"O"}, {w:"PINK", l:"P"}, {w:"QUIT", l:"Q"}, {w:"RAIN", l:"R"}, {w:"STAR", l:"S"}, {w:"TREE", l:"T"}, {w:"UNIT", l:"U"}, {w:"VEST", l:"V"}, {w:"WIND", l:"W"}, {w:"EXIT", l:"X"}, {w:"YELL", l:"Y"}, {w:"ZOOM", l:"Z"}],
             l3: [{w:"APPLE", l:"A"}, {w:"BREAD", l:"B"}, {w:"CLOCK", l:"C"}, {w:"DRESS", l:"D"}, {w:"EAGLE", l:"E"}, {w:"FRUIT", l:"F"}, {w:"GRAPE", l:"G"}, {w:"HOUSE", l:"H"}, {w:"IGLOO", l:"I"}, {w:"JELLY", l:"J"}, {w:"KOALA", l:"K"}, {w:"LEMON", l:"L"}, {w:"MOUSE", l:"M"}, {w:"NIGHT", l:"N"}, {w:"OCEAN", l:"O"}, {w:"PLANE", l:"P"}, {w:"QUEEN", l:"Q"}, {w:"ROBOT", l:"R"}, {w:"SNAKE", l:"S"}, {w:"TRAIN", l:"T"}, {w:"UNCLE", l:"U"}, {w:"VOICE", l:"V"}, {w:"WATER", l:"W"}, {w:"XYLO", l:"X"}, {w:"YOUNG", l:"Y"}, {w:"ZEBRA", l:"Z"}],
-            l4: [{w:"BRUSH", m:"word"}, {w:"SMILE", m:"word"}, {w:"PLANT", m:"word"}, {w:"STAMP", m:"word"}, {w:"SWIM", m:"word"}, {w:"GLASS", m:"word"}, {w:"TRASH", m:"word"}, {w:"CRAB", m:"word"}, {w:"FLIP", m:"word"}, {w:"DRIP", m:"word"}, {w:"SKIP", m:"word"}, {w:"STOP", m:"word"}],
-            l5: [{w:"GIRAFFE", m:"word"}, {w:"ELEPHANT", m:"word"}, {w:"RAINBOW", m:"word"}, {w:"OCTOPUS", m:"word"}, {w:"CHICKEN", m:"word"}, {w:"FLOWER", m:"word"}, {w:"DINOSAUR", m:"word"}, {w:"BUTTERFLY", m:"word"}, {w:"HAMBURGER", m:"word"}, {w:"UMBRELLA", m:"word"}, {w:"COMPUTER", m:"word"}, {w:"SQUIRREL", m:"word"}],
-            l6: [{w:"I LIKE DOGS", m:"word"}, {w:"THE BIG SUN", m:"word"}, {w:"A RED CAT", m:"word"}, {w:"SEE THE FISH", m:"word"}, {w:"GO TO BED", m:"word"}, {w:"MY FAST JEEP", m:"word"}, {w:"I CAN READ", m:"word"}, {w:"THE BLUE SKY", m:"word"}, {w:"A GREEN TREE", m:"word"}],
-            red: [{w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"}, {w:"THEY", l:"T"}, {w:"FROM", l:"F"}, {w:"DOES", l:"D"}, {w:"WHAT", l:"W"}, {w:"WANT", l:"W"}, {w:"GIVE", l:"G"}, {w:"SOME", l:"S"}, {w:"BECAUSE", l:"B"}, {w:"COULD", l:"C"}, {w:"YOUR", l:"Y"}]
+            l4: [
+                {w:"AXLE", l:"A"}, {w:"BLAST", l:"B"}, {w:"CRISP", l:"C"}, {w:"DRIFT", l:"D"}, {w:"ENTRY", l:"E"}, 
+                {w:"FROST", l:"F"}, {w:"GRUNT", l:"G"}, {w:"HATCH", l:"H"}, {w:"INDEX", l:"I"}, {w:"JOINT", l:"J"}, 
+                {w:"KNOCK", l:"K"}, {w:"LUNCH", l:"L"}, {w:"MARCH", l:"M"}, {w:"NORTH", l:"N"}, {w:"ORDER", l:"O"}, 
+                {w:"PLANT", l:"P"}, {w:"QUICK", l:"Q"}, {w:"ROAST", l:"R"}, {w:"SMILE", l:"S"}, {w:"TRUST", l:"T"}, 
+                {w:"UNDER", l:"U"}, {w:"VIVID", l:"V"}, {w:"WHALE", l:"W"}, {w:"X-RAY", l:"X"}, {w:"YOUTH", l:"Y"}, {w:"ZESTY", l:"Z"}
+            ],
+            l5: [
+                {w:"AIRPLANE", l:"A"}, {w:"BUTTERFLY", l:"B"}, {w:"COMPUTER", l:"C"}, {w:"DINOSAUR", l:"D"}, {w:"ELEPHANT", l:"E"}, 
+                {w:"FLAMINGO", l:"F"}, {w:"GIRAFFE", l:"G"}, {w:"HAMBURGER", l:"H"}, {w:"INVISIBLE", l:"I"}, {w:"JELLYFISH", l:"J"}, 
+                {w:"KANGAROO", l:"K"}, {w:"LIGHTNING", l:"L"}, {w:"MOUNTAIN", l:"M"}, {w:"NOTEBOOK", l:"N"}, {w:"OCTOPUS", l:"O"}, 
+                {w:"PENGUIN", l:"P"}, {w:"QUIETLY", l:"Q"}, {w:"RAINBOW", l:"R"}, {w:"SQUIRREL", l:"S"}, {w:"TELESCOPE", l:"T"}, 
+                {w:"UMBRELLA", l:"U"}, {w:"VEGETABLE", l:"V"}, {w:"WHEELBARROW", l:"W"}, {w:"XYLOPHONE", l:"X"}, {w:"YESTERDAY", l:"Y"}, {w:"ZOOLOGIST", l:"Z"}
+            ],
+            l6: [
+                {w:"I LIKE DOGS", m:"word"}, {w:"THE BIG SUN", m:"word"}, {w:"A RED CAT", m:"word"},
+                {w:"SEE THE FISH", m:"word"}, {w:"GO TO BED", m:"word"}, {w:"MY FAST JEEP", m:"word"},
+                {w:"I CAN READ", m:"word"}, {w:"THE BLUE SKY", m:"word"}, {w:"A GREEN TREE", m:"word"}
+            ],
+            red: [
+                {w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"},
+                {w:"THEY", l:"T"}, {w:"FROM", l:"F"}, {w:"DOES", l:"D"}, {w:"WHAT", l:"W"}, {w:"WANT", l:"W"},
+                {w:"GIVE", l:"G"}, {w:"SOME", l:"S"}, {w:"BECAUSE", l:"B"}, {w:"COULD", l:"C"}, {w:"YOUR", l:"Y"},
+                {w:"PEOPLE", l:"P"}, {w:"THROUGH", l:"T"}, {w:"THOUGHT", l:"T"}, {w:"LAUGH", l:"L"}, {w:"WHO", l:"W"},
+                {w:"WERE", l:"W"}, {w:"WHERE", l:"W"}, {w:"ONCE", l:"O"}, {w:"DOOR", l:"D"}, {w:"EYE", l:"E"}
+            ]
         };
 
         let stars = 0;
@@ -169,13 +190,11 @@
         function getFontSize(text, isWordMode) {
             const len = text.length;
             if (!isWordMode) return "4.5rem";
-            
-            // New aggressive scaling to prevent "Elephant" and "Dinosaur" from clipping
             if (len <= 4) return "2.8rem";
             if (len <= 6) return "2.3rem";
-            if (len <= 8) return "1.8rem"; // elephant, rainbow
-            if (len <= 10) return "1.5rem"; // dinosaur, umbrella
-            return "1.2rem"; // sentences
+            if (len <= 8) return "1.8rem";
+            if (len <= 11) return "1.4rem"; // Handles Wheelbarrow/Vegetable
+            return "1.1rem"; 
         }
 
         function fixSpokenContent(text, isLetter) {
@@ -187,7 +206,6 @@
                 return text;
             }
             if (upper === 'QUB') return 'Cube';
-            if (upper === 'XYLO') return 'Xylophone';
             return text;
         }
 
