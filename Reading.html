@@ -52,7 +52,7 @@
             padding: 20px 20px 140px 20px;
         }
 
-        /* RESTORED LIFT AND TILT */
+        /* LIFT AND TILT */
         .card {
             background: white;
             border: 5px solid #1e90ff;
@@ -77,7 +77,6 @@
 
         .card.active { border-color: #2ed573; background-color: #f0fff4; transform: scale(1.05); }
 
-        /* PULSING RED DOT */
         .speaking-dot {
             display: none;
             position: absolute;
@@ -96,7 +95,7 @@
         }
 
         .letter-header { font-size: 3.5rem; color: #1e90ff; font-weight: bold; margin-bottom: 5px; }
-        .target-word { font-weight: bold; color: #2f3542; font-size: 2rem; }
+        .target-word { font-weight: bold; color: #2f3542; font-size: 2.4rem; }
         
         .card.red-word { border-color: #ff4757; }
         .card.red-word .letter-header { color: #ff4757; }
@@ -162,8 +161,22 @@
                     createBlendCard(card, item.w);
                 } else {
                     const isSentence = item.l === "-";
-                    card.innerHTML = `<div class="speaking-dot"></div><span class="letter-header">${isSentence ? "" : item.l + item.l.toLowerCase()}</span><span class="target-word" style="font-size: ${isSentence ? '1.7rem' : '2.4rem'}">${item.w}</span>`;
-                    card.onclick = () => speakPhrase(card, isSentence ? item.w : `${item.l}... ${item.w}`, isSentence ? 0.7 : 0.85);
+                    card.innerHTML = `<div class="speaking-dot"></div><span class="letter-header">${isSentence ? "" : item.l + item.l.toLowerCase()}</span><span class="target-word" style="font-size: ${isSentence ? '1.8rem' : '2.4rem'}">${item.w}</span>`;
+                    card.onclick = () => {
+                        window.speechSynthesis.cancel();
+                        card.classList.add('active');
+                        const dot = card.querySelector('.speaking-dot');
+                        dot.style.display = 'block';
+                        const msg = new SpeechSynthesisUtterance(isSentence ? item.w.toLowerCase() : `${item.l.toLowerCase()}... ${item.w.toLowerCase()}`);
+                        msg.rate = isSentence ? 0.7 : 0.8;
+                        msg.onend = () => {
+                            stars++;
+                            document.getElementById('star-count').innerText = stars;
+                            dot.style.display = 'none';
+                            card.classList.remove('active');
+                        };
+                        window.speechSynthesis.speak(msg);
+                    };
                 }
                 grid.appendChild(card);
             });
@@ -174,35 +187,7 @@
             let wordHtml = `<div class="blend-display">`;
             chars.forEach((c, i) => wordHtml += `<span id="char-${word}-${i}">${c}</span>`);
             wordHtml += `</div>`;
-            card.innerHTML = `<div class="speaking-dot"></div>${wordHtml}<div class="slider-container"><input type="range" min="0" max="${chars.length}" value="0" oninput="handleBlend(this, '${word}', this.parentElement.parentElement)"></div><p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>`;
-        }
-
-        function speakPhrase(card, text, rate) {
-            // Hard Kill any current voice and clear dots
-            window.speechSynthesis.cancel();
-            document.querySelectorAll('.speaking-dot').forEach(d => d.style.display = 'none');
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-
-            const dot = card.querySelector('.speaking-dot');
-            card.classList.add('active');
-            dot.style.display = 'block';
-
-            // Safety timeout: stop the dot if voice fails to fire
-            const safety = setTimeout(() => {
-                dot.style.display = 'none';
-                card.classList.remove('active');
-            }, 4000);
-
-            const msg = new SpeechSynthesisUtterance(text.toLowerCase());
-            msg.rate = rate;
-            msg.onend = () => {
-                clearTimeout(safety);
-                dot.style.display = 'none';
-                card.classList.remove('active');
-                stars++;
-                document.getElementById('star-count').innerText = stars;
-            };
-            window.speechSynthesis.speak(msg);
+            card.innerHTML = `<div class="speaking-dot"></div>${wordHtml}<div class="slider-container"><input type="range" min="0" max="${chars.length}" value="0" oninput="handleBlend(this, '${word}', this.parentElement.parentElement)"></div><p style="color:#aaa; font-size:0.8rem">Slide to blend!</p>`;
         }
 
         function handleBlend(slider, word, card) {
@@ -210,6 +195,8 @@
             const val = parseInt(slider.value);
             const chars = word.split('');
             const dot = card.querySelector('.speaking-dot');
+            
+            // Reset highlighting
             chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = '');
 
             if (val > 0) {
@@ -217,12 +204,14 @@
                 document.getElementById(`char-${word}-${index}`).className = 'char-active';
                 dot.style.display = 'block';
                 
-                const isFinal = val === chars.length;
-                const msg = new SpeechSynthesisUtterance(isFinal ? word.toLowerCase() : chars[index].toLowerCase());
-                msg.rate = isFinal ? 0.7 : 1.1;
+                // Correct Blending logic: Individual letters, then full word sweep at the very end
+                const isFinalWord = (val === chars.length); 
+                const msg = new SpeechSynthesisUtterance(isFinalWord ? word.toLowerCase() : chars[index].toLowerCase());
+                msg.rate = isFinalWord ? 0.7 : 1.1;
+                
                 msg.onend = () => {
                     dot.style.display = 'none';
-                    if(isFinal) {
+                    if(isFinalWord) {
                         stars += 2;
                         document.getElementById('star-count').innerText = stars;
                         setTimeout(() => {
@@ -238,7 +227,6 @@
         }
 
         window.onload = () => loadLevel('l1', document.querySelector('.level-btn'));
-        window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     </script>
 </body>
 </html>
