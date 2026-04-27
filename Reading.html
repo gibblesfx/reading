@@ -69,17 +69,27 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 160px;
+            min-height: 180px;
             overflow: hidden; 
         }
 
         .card:hover {
             transform: translateY(-12px) rotate(-2deg);
             border-color: #ffa502;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
         }
 
-        .hint-text {
+        /* The Big Letter Clue */
+        .letter-header {
+            display: block;
+            font-size: 3.5rem;
+            color: #1e90ff;
+            font-weight: bold;
+            margin-bottom: 5px;
+            line-height: 1;
+        }
+
+        /* The Word to Read */
+        .target-word {
             display: block;
             font-weight: bold;
             color: #2f3542;
@@ -89,22 +99,11 @@
             transition: color 0.3s;
         }
 
-        .word-label { 
-            font-size: 1.3rem; 
-            color: #2ed573; 
-            font-weight: bold; 
-            display: block; 
-            opacity: 0; 
-            transition: 0.3s; 
-            margin-top: 10px;
-        }
-
+        .card.red-word .letter-header { color: #ff4757; }
         .card.red-word { border-color: #ff4757; }
-        .card.red-word .word-label { color: #ff4757; }
 
-        .card.active { border-color: #2ed573; background-color: #f0fff4; transform: scale(1.05) rotate(0deg) !important; }
-        .card.active .word-label { opacity: 1; }
-        .card.active .hint-text { color: #ced6e0; }
+        .card.active { border-color: #2ed573; background-color: #f0fff4; }
+        .card.active .target-word { color: #2ed573; transform: scale(1.1); }
 
         .speaking-ring {
             display: none;
@@ -143,8 +142,8 @@
         <button class="level-btn active" onclick="loadLevel('l1', this)">L1: A-Z (3)</button>
         <button class="level-btn" onclick="loadLevel('l2', this)">L2: A-Z (4)</button>
         <button class="level-btn" onclick="loadLevel('l3', this)">L3: A-Z (5)</button>
-        <button class="level-btn" onclick="loadLevel('l4', this)">L4: A-Z (Mix)</button>
-        <button class="level-btn" onclick="loadLevel('l5', this)">L5: A-Z (Big)</button>
+        <button class="level-btn" onclick="loadLevel('l4', this)">L4: Blends</button>
+        <button class="level-btn" onclick="loadLevel('l5', this)">L5: Big Words</button>
         <button class="level-btn" onclick="loadLevel('l6', this)">L6: Sentences</button>
         <button class="level-btn red-mode" onclick="loadLevel('red', this)">Red Words</button>
     </div>
@@ -157,43 +156,20 @@
             l1: [{w:"ANT", l:"A"}, {w:"BAT", l:"B"}, {w:"CAT", l:"C"}, {w:"DOG", l:"D"}, {w:"EGG", l:"E"}, {w:"FAN", l:"F"}, {w:"GUM", l:"G"}, {w:"HAT", l:"H"}, {w:"INK", l:"I"}, {w:"JAM", l:"J"}, {w:"KIT", l:"K"}, {w:"LOG", l:"L"}, {w:"MAP", l:"M"}, {w:"NET", l:"N"}, {w:"OWL", l:"O"}, {w:"PIG", l:"P"}, {w:"QUB", l:"Q"}, {w:"RUN", l:"R"}, {w:"SUN", l:"S"}, {w:"TEN", l:"T"}, {w:"UP!", l:"U"}, {w:"VAN", l:"V"}, {w:"WIG", l:"W"}, {w:"BOX", l:"X"}, {w:"YAK", l:"Y"}, {w:"ZAP", l:"Z"}],
             l2: [{w:"ATOM", l:"A"}, {w:"BIRD", l:"B"}, {w:"CAKE", l:"C"}, {w:"DUCK", l:"D"}, {w:"EAST", l:"E"}, {w:"FISH", l:"F"}, {w:"GATE", l:"G"}, {w:"HAND", l:"H"}, {w:"IRON", l:"I"}, {w:"JEEP", l:"J"}, {w:"KITE", l:"K"}, {w:"LAMP", l:"L"}, {w:"MOON", l:"M"}, {w:"NEST", l:"N"}, {w:"OPEN", l:"O"}, {w:"PINK", l:"P"}, {w:"QUIT", l:"Q"}, {w:"RAIN", l:"R"}, {w:"STAR", l:"S"}, {w:"TREE", l:"T"}, {w:"UNIT", l:"U"}, {w:"VEST", l:"V"}, {w:"WIND", l:"W"}, {w:"EXIT", l:"X"}, {w:"YELL", l:"Y"}, {w:"ZOOM", l:"Z"}],
             l3: [{w:"APPLE", l:"A"}, {w:"BREAD", l:"B"}, {w:"CLOCK", l:"C"}, {w:"DRESS", l:"D"}, {w:"EAGLE", l:"E"}, {w:"FRUIT", l:"F"}, {w:"GRAPE", l:"G"}, {w:"HOUSE", l:"H"}, {w:"IGLOO", l:"I"}, {w:"JELLY", l:"J"}, {w:"KOALA", l:"K"}, {w:"LEMON", l:"L"}, {w:"MOUSE", l:"M"}, {w:"NIGHT", l:"N"}, {w:"OCEAN", l:"O"}, {w:"PLANE", l:"P"}, {w:"QUEEN", l:"Q"}, {w:"ROBOT", l:"R"}, {w:"SNAKE", l:"S"}, {w:"TRAIN", l:"T"}, {w:"UNCLE", l:"U"}, {w:"VOICE", l:"V"}, {w:"WATER", l:"W"}, {w:"XYLO", l:"X"}, {w:"YOUNG", l:"Y"}, {w:"ZEBRA", l:"Z"}],
-            l4: [
-                {w:"AXLE", l:"A"}, {w:"BLAST", l:"B"}, {w:"CRISP", l:"C"}, {w:"DRIFT", l:"D"}, {w:"ENTRY", l:"E"}, 
-                {w:"FROST", l:"F"}, {w:"GRUNT", l:"G"}, {w:"HATCH", l:"H"}, {w:"INDEX", l:"I"}, {w:"JOINT", l:"J"}, 
-                {w:"KNOCK", l:"K"}, {w:"LUNCH", l:"L"}, {w:"MARCH", l:"M"}, {w:"NORTH", l:"N"}, {w:"ORDER", l:"O"}, 
-                {w:"PLANT", l:"P"}, {w:"QUICK", l:"Q"}, {w:"ROAST", l:"R"}, {w:"SMILE", l:"S"}, {w:"TRUST", l:"T"}, 
-                {w:"UNDER", l:"U"}, {w:"VIVID", l:"V"}, {w:"WHALE", l:"W"}, {w:"X-RAY", l:"X"}, {w:"YOUTH", l:"Y"}, {w:"ZESTY", l:"Z"}
-            ],
-            l5: [
-                {w:"AIRPLANE", l:"A"}, {w:"BUTTERFLY", l:"B"}, {w:"COMPUTER", l:"C"}, {w:"DINOSAUR", l:"D"}, {w:"ELEPHANT", l:"E"}, 
-                {w:"FLAMINGO", l:"F"}, {w:"GIRAFFE", l:"G"}, {w:"HAMBURGER", l:"H"}, {w:"INVISIBLE", l:"I"}, {w:"JELLYFISH", l:"J"}, 
-                {w:"KANGAROO", l:"K"}, {w:"LIGHTNING", l:"L"}, {w:"MOUNTAIN", l:"M"}, {w:"NOTEBOOK", l:"N"}, {w:"OCTOPUS", l:"O"}, 
-                {w:"PENGUIN", l:"P"}, {w:"QUIETLY", l:"Q"}, {w:"RAINBOW", l:"R"}, {w:"SQUIRREL", l:"S"}, {w:"TELESCOPE", l:"T"}, 
-                {w:"UMBRELLA", l:"U"}, {w:"VEGETABLE", l:"V"}, {w:"WHEELBARROW", l:"W"}, {w:"XYLOPHONE", l:"X"}, {w:"YESTERDAY", l:"Y"}, {w:"ZOOLOGIST", l:"Z"}
-            ],
-            l6: [
-                {w:"I LIKE DOGS", m:"word"}, {w:"THE BIG SUN", m:"word"}, {w:"A RED CAT", m:"word"},
-                {w:"SEE THE FISH", m:"word"}, {w:"GO TO BED", m:"word"}, {w:"MY FAST JEEP", m:"word"},
-                {w:"I CAN READ", m:"word"}, {w:"THE BLUE SKY", m:"word"}, {w:"A GREEN TREE", m:"word"}
-            ],
-            red: [
-                {w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"},
-                {w:"THEY", l:"T"}, {w:"FROM", l:"F"}, {w:"DOES", l:"D"}, {w:"WHAT", l:"W"}, {w:"WANT", l:"W"},
-                {w:"GIVE", l:"G"}, {w:"SOME", l:"S"}, {w:"BECAUSE", l:"B"}, {w:"COULD", l:"C"}, {w:"YOUR", l:"Y"},
-                {w:"PEOPLE", l:"P"}, {w:"THROUGH", l:"T"}, {w:"THOUGHT", l:"T"}, {w:"LAUGH", l:"L"}, {w:"WHO", l:"W"},
-                {w:"WERE", l:"W"}, {w:"WHERE", l:"W"}, {w:"ONCE", l:"O"}, {w:"DOOR", l:"D"}, {w:"EYE", l:"E"}
-            ]
+            l4: [{w:"AXLE", l:"A"}, {w:"BLAST", l:"B"}, {w:"CRISP", l:"C"}, {w:"DRIFT", l:"D"}, {w:"ENTRY", l:"E"}, {w:"FROST", l:"F"}, {w:"GRUNT", l:"G"}, {w:"HATCH", l:"H"}, {w:"INDEX", l:"I"}, {w:"JOINT", l:"J"}, {w:"KNOCK", l:"K"}, {w:"LUNCH", l:"L"}, {w:"MARCH", l:"M"}, {w:"NORTH", l:"N"}, {w:"ORDER", l:"O"}, {w:"PLANT", l:"P"}, {w:"QUICK", l:"Q"}, {w:"ROAST", l:"R"}, {w:"SMILE", l:"S"}, {w:"TRUST", l:"T"}, {w:"UNDER", l:"U"}, {w:"VIVID", l:"V"}, {w:"WHALE", l:"W"}, {w:"X-RAY", l:"X"}, {w:"YOUTH", l:"Y"}, {w:"ZESTY", l:"Z"}],
+            l5: [{w:"AIRPLANE", l:"A"}, {w:"BUTTERFLY", l:"B"}, {w:"COMPUTER", l:"C"}, {w:"DINOSAUR", l:"D"}, {w:"ELEPHANT", l:"E"}, {w:"FLAMINGO", l:"F"}, {w:"GIRAFFE", l:"G"}, {w:"HAMBURGER", l:"H"}, {w:"INVISIBLE", l:"I"}, {w:"JELLYFISH", l:"J"}, {w:"KANGAROO", l:"K"}, {w:"LIGHTNING", l:"L"}, {w:"MOUNTAIN", l:"M"}, {w:"NOTEBOOK", l:"N"}, {w:"OCTOPUS", l:"O"}, {w:"PENGUIN", l:"P"}, {w:"QUIETLY", l:"Q"}, {w:"RAINBOW", l:"R"}, {w:"SQUIRREL", l:"S"}, {w:"TELESCOPE", l:"T"}, {w:"UMBRELLA", l:"U"}, {w:"VEGETABLE", l:"V"}, {w:"WHEELBARROW", l:"W"}, {w:"XYLOPHONE", l:"X"}, {w:"YESTERDAY", l:"Y"}, {w:"ZOOLOGIST", l:"Z"}],
+            l6: [{w:"I LIKE DOGS", l:"-"}, {w:"THE BIG SUN", l:"-"}, {w:"A RED CAT", l:"-"}, {w:"SEE THE FISH", l:"-"}, {w:"GO TO BED", l:"-"}, {w:"MY FAST JEEP", l:"-"}, {w:"I CAN READ", l:"-"}, {w:"THE BLUE SKY", l:"-"}, {w:"A GREEN TREE", l:"-"}],
+            red: [{w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"}, {w:"THEY", l:"T"}, {w:"FROM", l:"F"}, {w:"DOES", l:"D"}, {w:"WHAT", l:"W"}, {w:"WANT", l:"W"}, {w:"GIVE", l:"G"}, {w:"SOME", l:"S"}, {w:"BECAUSE", l:"B"}, {w:"COULD", l:"C"}, {w:"YOUR", l:"Y"}, {w:"PEOPLE", l:"P"}, {w:"THROUGH", l:"T"}, {w:"THOUGHT", l:"T"}, {w:"LAUGH", l:"L"}, {w:"WHO", l:"W"}, {w:"WERE", l:"W"}, {w:"WHERE", l:"W"}, {w:"ONCE", l:"O"}, {w:"DOOR", l:"D"}, {w:"EYE", l:"E"}]
         };
 
         let stars = 0;
 
-        function getFontSize(text, isWordMode) {
+        function getFontSize(text) {
             const len = text.length;
-            if (!isWordMode) return "4.5rem";
             if (len <= 4) return "2.8rem";
             if (len <= 6) return "2.3rem";
             if (len <= 8) return "1.8rem";
-            if (len <= 11) return "1.4rem"; // Handles Wheelbarrow/Vegetable
+            if (len <= 11) return "1.4rem";
             return "1.1rem"; 
         }
 
@@ -218,23 +194,19 @@
             grid.innerHTML = ''; 
 
             wordData[levelId].forEach(item => {
-                const isWordMode = item.m === "word";
-                const displayValue = isWordMode ? item.w : item.l;
-                const fontSize = getFontSize(displayValue, isWordMode);
+                const fontSize = getFontSize(item.w);
+                const letterPair = (item.l === "-") ? "" : `${item.l}${item.l.toLowerCase()}`;
                 
                 const card = document.createElement('div');
                 card.className = 'card' + (levelId === 'red' ? ' red-word' : '');
                 
                 card.innerHTML = `
                     <div class="speaking-ring"></div>
-                    <span class="hint-text" style="font-size: ${fontSize}">${displayValue}</span>
-                    <span class="word-label">${isWordMode ? 'Star!' : item.w}</span>
+                    <span class="letter-header">${letterPair}</span>
+                    <span class="target-word" style="font-size: ${fontSize}">${item.w}</span>
                 `;
                 
-                card.onclick = () => {
-                    if(isWordMode) speakFullWord(item.w, card);
-                    else speakSequenced(item.l, item.w, card);
-                };
+                card.onclick = () => speakSequenced(item.l, item.w, card);
                 grid.appendChild(card);
             });
         }
@@ -242,19 +214,15 @@
         function speakSequenced(letter, word, element) {
             window.speechSynthesis.cancel();
             resetUI();
+            
             const fixedLetter = fixSpokenContent(letter, true);
             const fixedWord = fixSpokenContent(word, false);
-            const msg = new SpeechSynthesisUtterance(`${fixedLetter}. ... ... ${fixedWord}`);
-            setupVoice(msg, 0.8);
-            attachEvents(msg, element);
-            window.speechSynthesis.speak(msg);
-        }
-
-        function speakFullWord(word, element) {
-            window.speechSynthesis.cancel();
-            resetUI();
-            const fixedWord = fixSpokenContent(word, false);
-            const msg = new SpeechSynthesisUtterance(`${fixedWord}. ... ... ${fixedWord}`);
+            
+            // If it's a sentence (no letter clue), just say the sentence.
+            // Otherwise, say "Letter... Word"
+            const phrase = (letter === "-") ? `${fixedWord}` : `${fixedLetter}. ... ... ${fixedWord}`;
+            
+            const msg = new SpeechSynthesisUtterance(phrase);
             setupVoice(msg, 0.75);
             attachEvents(msg, element);
             window.speechSynthesis.speak(msg);
@@ -282,7 +250,7 @@
                 stars++;
                 document.getElementById('star-count').innerText = stars;
                 ring.style.display = 'none';
-                setTimeout(() => { if (element.classList.contains('active')) element.classList.remove('active'); }, 1200);
+                setTimeout(() => { element.classList.remove('active'); }, 500);
             };
         }
 
