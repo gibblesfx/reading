@@ -15,7 +15,7 @@
             margin: 0;
         }
 
-        h1 { color: #ff4757; font-size: 2.8rem; margin: 10px 0; text-shadow: 2px 2px #fff; }
+        h1 { color: #ff4757; font-size: 2.8rem; margin: 10px 0; }
         
         .nav-container {
             margin: 20px auto;
@@ -35,10 +35,9 @@
             background: white;
             color: #1e90ff;
             font-weight: bold;
-            transition: all 0.3s ease;
         }
 
-        .level-btn.active { background: #1e90ff; color: white; transform: scale(1.05); }
+        .level-btn.active { background: #1e90ff; color: white; }
         .level-btn.blend-mode.active { background: #ffa502; border-color: #ffa502; }
         .level-btn.red-mode.active { background: #ff4757; border-color: #ff4757; }
 
@@ -56,30 +55,22 @@
             border: 5px solid #1e90ff;
             border-radius: 25px;
             padding: 20px;
-            position: relative;
             box-shadow: 0 8px 15px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 220px;
+            cursor: pointer;
         }
 
         .card.active { border-color: #2ed573; background-color: #f0fff4; }
 
-        .blend-display {
-            font-size: 4rem;
-            letter-spacing: 15px;
-            margin-bottom: 20px;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-        }
-
-        .char-active { color: #ffa502; transform: scale(1.2); display: inline-block; text-shadow: 1px 1px 5px rgba(255, 165, 2, 0.3); }
+        .blend-display { font-size: 4rem; letter-spacing: 15px; margin-bottom: 20px; font-weight: bold; }
+        .char-active { color: #ffa502; transform: scale(1.2); display: inline-block; }
 
         .slider-container { width: 90%; margin-top: 15px; }
-        input[type=range] { width: 100%; cursor: pointer; height: 15px; border-radius: 10px; }
+        input[type=range] { width: 100%; cursor: pointer; height: 15px; }
 
         .footer-score {
             position: fixed;
@@ -92,11 +83,10 @@
             font-size: 2rem;
             color: #ffa502;
             font-weight: bold;
-            z-index: 100;
         }
 
-        .letter-header { font-size: 3rem; color: #1e90ff; font-weight: bold; margin-bottom: 10px; line-height: 1; }
-        .target-word { font-weight: bold; color: #2f3542; line-height: 1.1; }
+        .letter-header { font-size: 3rem; color: #1e90ff; font-weight: bold; margin-bottom: 10px; }
+        .target-word { font-weight: bold; color: #2f3542; }
         .card.red-word { border-color: #ff4757; }
         .card.red-word .letter-header { color: #ff4757; }
     </style>
@@ -111,7 +101,7 @@
         <button class="level-btn" onclick="loadLevel('l3', this)">L3</button>
         <button class="level-btn" onclick="loadLevel('l4', this)">L4</button>
         <button class="level-btn" onclick="loadLevel('l5', this)">L5</button>
-        <button class="level-btn" onclick="loadLevel('l6', this)">L6: Sentences</button>
+        <button class="level-btn" onclick="loadLevel('l6', this)">L6</button>
         <button class="level-btn red-mode" onclick="loadLevel('red', this)">Red Words</button>
         <button class="level-btn blend-mode" onclick="loadLevel('blend', this)">🌟 Blending</button>
     </div>
@@ -126,18 +116,27 @@
             l3: [{w:"APPLE", l:"A"}, {w:"BREAD", l:"B"}, {w:"CLOCK", l:"C"}, {w:"DRESS", l:"D"}, {w:"EAGLE", l:"E"}, {w:"FRUIT", l:"F"}, {w:"GRAPE", l:"G"}, {w:"HOUSE", l:"H"}, {w:"IGLOO", l:"I"}, {w:"JELLY", l:"J"}, {w:"KOALA", l:"K"}, {w:"LEMON", l:"L"}, {w:"MOUSE", l:"M"}, {w:"NIGHT", l:"N"}, {w:"OCEAN", l:"O"}, {w:"PLANE", l:"P"}, {w:"QUEEN", l:"Q"}, {w:"ROBOT", l:"R"}, {w:"SNAKE", l:"S"}, {w:"TRAIN", l:"T"}, {w:"UNCLE", l:"U"}, {w:"VOICE", l:"V"}, {w:"WATER", l:"W"}, {w:"XYLO", l:"X"}, {w:"YOUNG", l:"Y"}, {w:"ZEBRA", l:"Z"}],
             l4: [{w:"AXLE", l:"A"}, {w:"BLAST", l:"B"}, {w:"CRISP", l:"C"}, {w:"DRIFT", l:"D"}, {w:"ENTRY", l:"E"}, {w:"FROST", l:"F"}, {w:"GRUNT", l:"G"}, {w:"HATCH", l:"H"}, {w:"INDEX", l:"I"}, {w:"JOINT", l:"J"}, {w:"KNOCK", l:"K"}, {w:"LUNCH", l:"L"}, {w:"MARCH", l:"M"}, {w:"NORTH", l:"N"}, {w:"ORDER", l:"O"}, {w:"PLANT", l:"P"}, {w:"QUICK", l:"Q"}, {w:"ROAST", l:"R"}, {w:"SMILE", l:"S"}, {w:"TRUST", l:"T"}, {w:"UNDER", l:"U"}, {w:"VIVID", l:"V"}, {w:"WHALE", l:"W"}, {w:"X-RAY", l:"X"}, {w:"YOUTH", l:"Y"}, {w:"ZESTY", l:"Z"}],
             l5: [{w:"AIRPLANE", l:"A"}, {w:"BUTTERFLY", l:"B"}, {w:"COMPUTER", l:"C"}, {w:"DINOSAUR", l:"D"}, {w:"ELEPHANT", l:"E"}, {w:"FLAMINGO", l:"F"}, {w:"GIRAFFE", l:"G"}, {w:"HAMBURGER", l:"H"}, {w:"INVISIBLE", l:"I"}, {w:"JELLYFISH", l:"J"}, {w:"KANGAROO", l:"K"}, {w:"LIGHTNING", l:"L"}, {w:"MOUNTAIN", l:"M"}, {w:"NOTEBOOK", l:"N"}, {w:"OCTOPUS", l:"O"}, {w:"PENGUIN", l:"P"}, {w:"QUIETLY", l:"Q"}, {w:"RAINBOW", l:"R"}, {w:"SQUIRREL", l:"S"}, {w:"TELESCOPE", l:"T"}, {w:"UMBRELLA", l:"U"}, {w:"VEGETABLE", l:"V"}, {w:"WHEELBARROW", l:"W"}, {w:"XYLOPHONE", l:"X"}, {w:"YESTERDAY", l:"Y"}, {w:"ZOOLOGIST", l:"Z"}],
-            l6: [
-                {w:"I LIKE CATS", l:"-"}, {w:"SEE THE DOG", l:"-"}, {w:"MY BIG RED HAT", l:"-"}, {w:"GO TO THE BED", l:"-"},
-                {w:"A FAST BLUE JEEP", l:"-"}, {w:"CAN YOU RUN?", l:"-"}, {w:"I SEE THE SUN", l:"-"}, {w:"THE BOX IS BIG", l:"-"},
-                {w:"LOOK AT THE PIG", l:"-"}, {w:"WE CAN PLAY", l:"-"}, {w:"THE CAT IS ON THE MAT", l:"-"}, {w:"I LIKE TO SWIM", l:"-"},
-                {w:"SEE THE GREEN TREE", l:"-"}, {w:"MY MOM IS KIND", l:"-"}, {w:"THE DUCK CAN QUACK", l:"-"}, {w:"HE HAS A TOY", l:"-"},
-                {w:"SHE SAW THE BIRD", l:"-"}, {w:"WE WENT TO THE PARK", l:"-"}, {w:"I CAN READ WORDS", l:"-"}, {w:"YOU ARE A STAR", l:"-"}
-            ],
+            l6: [{w:"I LIKE CATS", l:"-"}, {w:"SEE THE DOG", l:"-"}, {w:"MY BIG RED HAT", l:"-"}, {w:"GO TO THE BED", l:"-"}, {w:"A FAST BLUE JEEP", l:"-"}, {w:"CAN YOU RUN?", l:"-"}, {w:"I SEE THE SUN", l:"-"}, {w:"THE BOX IS BIG", l:"-"}, {w:"LOOK AT THE PIG", l:"-"}, {w:"WE CAN PLAY", l:"-"}, {w:"THE CAT IS ON THE MAT", l:"-"}, {w:"I LIKE TO SWIM", l:"-"}, {w:"SEE THE GREEN TREE", l:"-"}, {w:"MY MOM IS KIND", l:"-"}, {w:"THE DUCK CAN QUACK", l:"-"}, {w:"HE HAS A TOY", l:"-"}, {w:"SHE SAW THE BIRD", l:"-"}, {w:"WE WENT TO THE PARK", l:"-"}, {w:"I CAN READ WORDS", l:"-"}, {w:"YOU ARE A STAR", l:"-"}],
             red: [{w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"}, {w:"THEY", l:"T"}, {w:"FROM", l:"F"}, {w:"DOES", l:"D"}, {w:"WHAT", l:"W"}, {w:"WANT", l:"W"}, {w:"GIVE", l:"G"}, {w:"SOME", l:"S"}, {w:"BECAUSE", l:"B"}, {w:"COULD", l:"C"}, {w:"YOUR", l:"Y"}, {w:"PEOPLE", l:"P"}, {w:"THROUGH", l:"T"}, {w:"THOUGHT", l:"T"}, {w:"LAUGH", l:"L"}, {w:"WHO", l:"W"}, {w:"WERE", l:"W"}, {w:"WHERE", l:"W"}, {w:"ONCE", l:"O"}, {w:"DOOR", l:"D"}, {w:"EYE", l:"E"}],
             blend: [{w:"CAT"}, {w:"DOG"}, {w:"SUN"}, {w:"MAP"}, {w:"TEN"}, {w:"PIG"}, {w:"FOX"}, {w:"BAT"}, {w:"JAM"}, {w:"LOG"}]
         };
 
         let stars = 0;
+
+        function safeSpeak(text, rate = 0.8, onEndCallback = null) {
+            // CRITICAL: Hard Reset the speech engine
+            window.speechSynthesis.cancel();
+            
+            const msg = new SpeechSynthesisUtterance(text.toLowerCase());
+            msg.rate = rate;
+            msg.pitch = 1.1;
+
+            const voices = window.speechSynthesis.getVoices();
+            msg.voice = voices.find(v => v.name.includes('Google') && v.lang.includes('en')) || voices[0];
+
+            if (onEndCallback) msg.onend = onEndCallback;
+            window.speechSynthesis.speak(msg);
+        }
 
         function loadLevel(levelId, btn) {
             window.speechSynthesis.cancel();
@@ -155,13 +154,20 @@
                     createBlendCard(card, item.w);
                 } else {
                     const isSentence = item.l === "-";
-                    const letterPair = isSentence ? "" : `${item.l}${item.l.toLowerCase()}`;
-                    const fontSize = isSentence ? "1.6rem" : "2rem";
                     card.innerHTML = `
-                        <span class="letter-header">${letterPair}</span>
-                        <span class="target-word" style="font-size: ${fontSize}">${item.w}</span>
+                        <span class="letter-header">${isSentence ? "" : item.l + item.l.toLowerCase()}</span>
+                        <span class="target-word" style="font-size: ${isSentence ? "1.6rem" : "2rem"}">${item.w}</span>
                     `;
-                    card.onclick = () => speakBasic(item.l, item.w, card);
+                    card.onclick = () => {
+                        resetUI();
+                        card.classList.add('active');
+                        const phrase = isSentence ? item.w : `${item.l}... ${item.w}`;
+                        safeSpeak(phrase, isSentence ? 0.7 : 0.8, () => {
+                            stars++;
+                            document.getElementById('star-count').innerText = stars;
+                            setTimeout(() => card.classList.remove('active'), 500);
+                        });
+                    };
                 }
                 grid.appendChild(card);
             });
@@ -170,92 +176,42 @@
         function createBlendCard(card, word) {
             const chars = word.split('');
             let wordHtml = `<div class="blend-display">`;
-            chars.forEach((c, i) => {
-                wordHtml += `<span id="char-${word}-${i}">${c}</span>`;
-            });
+            chars.forEach((c, i) => wordHtml += `<span id="char-${word}-${i}">${c}</span>`);
             wordHtml += `</div>`;
 
-            card.innerHTML = `
-                ${wordHtml}
-                <div class="slider-container">
-                    <input type="range" min="0" max="${chars.length}" value="0" 
-                        oninput="handleBlend(this, '${word}')">
-                </div>
-                <p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>
-            `;
+            card.innerHTML = `${wordHtml}
+                <div class="slider-container"><input type="range" min="0" max="${chars.length}" value="0" oninput="handleBlend(this, '${word}')"></div>
+                <p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>`;
         }
 
         function handleBlend(slider, word) {
-            window.speechSynthesis.cancel();
             const val = parseInt(slider.value);
             const chars = word.split('');
-            
-            // Clear all highlights
-            chars.forEach((_, i) => {
-                document.getElementById(`char-${word}-${i}`).className = '';
-            });
+            chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = '');
 
             if (val > 0) {
                 const index = val - 1;
                 document.getElementById(`char-${word}-${index}`).className = 'char-active';
                 
-                // If we reach the end of the notches, read the full word
                 if (val === chars.length) {
-                    const msg = new SpeechSynthesisUtterance(word.toLowerCase());
-                    msg.rate = 0.7;
-                    msg.onend = () => {
+                    safeSpeak(word, 0.7, () => {
                         stars += 2;
-                        updateScore();
+                        document.getElementById('star-count').innerText = stars;
                         setTimeout(() => { 
                             slider.value = 0; 
                             chars.forEach((_, i) => document.getElementById(`char-${word}-${i}`).className = '');
                         }, 1200);
-                    };
-                    setupVoice(msg);
-                    window.speechSynthesis.speak(msg);
+                    });
                 } else {
-                    // Otherwise, read the individual phoneme
-                    const msg = new SpeechSynthesisUtterance(chars[index].toLowerCase());
-                    msg.rate = 1.1;
-                    setupVoice(msg);
-                    window.speechSynthesis.speak(msg);
+                    safeSpeak(chars[index], 1.1);
                 }
             }
         }
 
-        function speakBasic(letter, text, element) {
-            window.speechSynthesis.cancel();
-            resetUI();
-            element.classList.add('active');
-
-            const speakText = text.toLowerCase();
-            const phrase = (letter === "-") ? speakText : `${letter.toLowerCase()}. ... ${speakText}`;
-            
-            const msg = new SpeechSynthesisUtterance(phrase);
-            msg.rate = (letter === "-") ? 0.7 : 0.8;
-            msg.onend = () => {
-                stars++;
-                updateScore();
-                setTimeout(() => element.classList.remove('active'), 500);
-            };
-            setupVoice(msg);
-            window.speechSynthesis.speak(msg);
-        }
-
-        function setupVoice(msg) {
-            const voices = window.speechSynthesis.getVoices();
-            msg.voice = voices.find(v => v.name.includes('Google US English')) || voices.find(v => v.name.includes('Natural')) || voices[0];
-        }
-
-        function updateScore() {
-            document.getElementById('star-count').innerText = stars;
-        }
-
-        function resetUI() {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-        }
+        function resetUI() { document.querySelectorAll('.card').forEach(c => c.classList.remove('active')); }
 
         window.onload = () => loadLevel('l1', document.querySelector('.level-btn'));
+        // Pre-warm voices
         window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     </script>
 </body>
