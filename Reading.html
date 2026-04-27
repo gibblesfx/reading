@@ -3,184 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reading Adventure Pro</title>
+    <title>Reading Adventure: Mega List</title>
     <style>
-        /* Premium UX Styling */
         body {
             font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
             background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
             text-align: center;
-            padding: 40px 20px;
+            padding: 20px;
             color: #2f3542;
             min-height: 100vh;
         }
 
-        h1 { color: #ff4757; font-size: 3.5rem; margin-bottom: 10px; text-shadow: 2px 2px #fff; }
+        h1 { color: #ff4757; font-size: 3rem; margin-bottom: 5px; text-shadow: 2px 2px #fff; }
         
         .nav-container {
-            margin: 30px auto;
+            margin: 20px auto;
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
-            max-width: 800px;
+            max-width: 1000px;
         }
 
         .level-btn {
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            border: 4px solid #1e90ff;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: 3px solid #1e90ff;
             border-radius: 50px;
             cursor: pointer;
             background: white;
             color: #1e90ff;
             font-weight: bold;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .level-btn.active {
             background: #1e90ff;
             color: white;
-            transform: scale(1.1);
-            box-shadow: 0 8px 20px rgba(30, 144, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(30, 144, 255, 0.3);
+        }
+
+        .level-btn.red-mode.active {
+            background: #ff4757;
+            border-color: #ff4757;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 25px;
-            max-width: 1000px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding-bottom: 100px;
         }
 
         .card {
             background: white;
-            border: 6px solid #1e90ff;
-            border-radius: 30px;
-            padding: 35px 15px;
+            border: 5px solid #1e90ff;
+            border-radius: 25px;
+            padding: 25px 10px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
             position: relative;
-            overflow: hidden;
         }
 
-        .card:hover {
-            transform: translateY(-10px);
-            border-color: #ffa502;
-        }
+        .card.red-word { border-color: #ff4757; }
+        .card.red-word .word { color: #ff4757; }
 
-        .letter-hint {
-            font-size: 5rem;
-            display: block;
-            font-weight: bold;
-            color: #2f3542;
-            transition: color 0.3s;
-        }
+        .letter-hint { font-size: 3.5rem; display: block; font-weight: bold; color: #2f3542; }
+        .word { font-size: 1.6rem; color: #2ed573; font-weight: bold; display: block; opacity: 0; }
 
-        .word {
-            font-size: 2rem;
-            color: #2ed573;
-            font-weight: bold;
-            display: block;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s;
-        }
-
-        .card.active { border-color: #2ed573; background-color: #f0fff4; }
-        .card.active .word { opacity: 1; transform: translateY(0); }
+        .card.active { border-color: #ffa502; background-color: #fffaf0; transform: scale(1.05); }
+        .card.active .word { opacity: 1; }
         .card.active .letter-hint { color: #ced6e0; }
 
-        /* The Pulse Animation */
         .speaking-ring {
             display: none;
             position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 25px;
-            height: 25px;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
             background-color: #ff4757;
             border-radius: 50%;
             animation: pulse 1s infinite;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2.5); opacity: 0; }
-        }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
 
-        .star-score {
-            font-size: 2.2rem;
-            margin-top: 50px;
+        .footer-stats {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: 15px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+            font-size: 1.8rem;
             color: #ffa502;
-            text-shadow: 1px 1px white;
         }
     </style>
 </head>
 <body>
 
-    <h1>Reading Adventure 🍎</h1>
-    <p style="font-size: 1.2rem;">Choose a level and tap the letters!</p>
+    <h1>Reading Stars ⭐</h1>
     
     <div class="nav-container">
-        <button class="level-btn active" onclick="loadLevel(1, this)">Level 1 (3 Letters)</button>
-        <button class="level-btn" onclick="loadLevel(2, this)">Level 2 (4 Letters)</button>
-        <button class="level-btn" onclick="loadLevel(3, this)">Level 3 (5 Letters)</button>
+        <button class="level-btn active" onclick="loadLevel('l1', this)">Level 1 (3 Letters)</button>
+        <button class="level-btn" onclick="loadLevel('l2', this)">Level 2 (4 Letters)</button>
+        <button class="level-btn" onclick="loadLevel('l3', this)">Level 3 (5 Letters)</button>
+        <button class="level-btn red-mode" onclick="loadLevel('red', this)">OG Red Words</button>
     </div>
 
     <div id="game-grid" class="grid"></div>
 
-    <div class="star-score">Stars: <span id="star-count">0</span> ⭐</div>
+    <div class="footer-stats">Stars: <span id="star-count">0</span> 🌟</div>
 
     <script>
-        const levels = {
-            1: [
-                { word: "CAT", letter: "C" }, { word: "DOG", letter: "D" },
-                { word: "SUN", letter: "S" }, { word: "BED", letter: "B" },
-                { word: "PIG", letter: "P" }, { word: "HAT", letter: "H" }
+        const wordData = {
+            l1: [
+                { w: "CAT", l: "C" }, { w: "DOG", l: "D" }, { w: "SUN", l: "S" }, { w: "BED", l: "B" },
+                { w: "PIG", l: "P" }, { w: "HAT", l: "H" }, { w: "BOX", l: "B" }, { w: "CUP", l: "C" },
+                { w: "JET", l: "J" }, { w: "MAP", l: "M" }, { w: "NET", l: "N" }, { w: "PEN", l: "P" },
+                { w: "RUN", l: "R" }, { w: "TEN", l: "T" }, { w: "WIG", l: "W" }, { w: "VAN", l: "V" }
             ],
-            2: [
-                { word: "FISH", letter: "F" }, { word: "FROG", letter: "F" },
-                { word: "BIRD", letter: "B" }, { word: "STAR", letter: "S" },
-                { word: "DUCK", letter: "D" }, { word: "CAKE", letter: "C" }
+            l2: [
+                { w: "FISH", l: "F" }, { w: "FROG", l: "F" }, { w: "BIRD", l: "B" }, { w: "STAR", l: "S" },
+                { w: "DUCK", l: "D" }, { w: "CAKE", l: "C" }, { w: "BOAT", l: "B" }, { w: "TREE", l: "T" },
+                { w: "MOON", l: "M" }, { w: "LAMP", l: "L" }, { w: "HAND", l: "H" }, { w: "DRUM", l: "D" },
+                { w: "FIRE", l: "F" }, { w: "KITE", l: "K" }, { w: "MILK", l: "M" }, { w: "WIND", l: "W" }
             ],
-            3: [
-                { word: "TRUCK", letter: "T" }, { word: "APPLE", letter: "A" },
-                { word: "GRAPE", letter: "G" }, { word: "HOUSE", letter: "H" },
-                { word: "SNAKE", letter: "S" }, { word: "PLANE", letter: "P" }
+            l3: [
+                { w: "TRUCK", l: "T" }, { w: "APPLE", l: "A" }, { w: "GRAPE", l: "G" }, { w: "HOUSE", l: "H" },
+                { w: "SNAKE", l: "S" }, { w: "PLANE", l: "P" }, { w: "BREAD", l: "B" }, { w: "CLOCK", l: "C" },
+                { w: "DRESS", l: "D" }, { w: "GRASS", l: "G" }, { w: "HEART", l: "H" }, { w: "PHONE", l: "P" },
+                { w: "SHIRT", l: "S" }, { w: "SPOON", l: "S" }, { w: "TRAIN", l: "T" }, { w: "WATER", l: "W" }
+            ],
+            red: [
+                { w: "THE", l: "T" }, { w: "SAID", l: "S" }, { w: "WAS", l: "W" }, { w: "FOR", l: "F" },
+                { w: "ARE", l: "A" }, { w: "YOU", l: "Y" }, { w: "THEY", l: "T" }, { w: "FROM", l: "F" },
+                { w: "DOES", l: "D" }, { w: "COME", l: "C" }, { w: "WHAT", l: "W" }, { w: "WANT", l: "W" },
+                { w: "GIVE", l: "G" }, { w: "SOME", l: "S" }, { w: "BECAUSE", l: "B" }, { w: "COULD", l: "C" },
+                { w: "WHERE", l: "W" }, { w: "THERE", l: "T" }, { w: "YOUR", l: "Y" }, { w: "HERE", l: "H" }
             ]
         };
 
         let stars = 0;
 
-        function loadLevel(levelNum, btn) {
+        function loadLevel(levelId, btn) {
+            window.speechSynthesis.cancel();
             document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
             const grid = document.getElementById('game-grid');
             grid.innerHTML = ''; 
 
-            levels[levelNum].forEach(item => {
+            wordData[levelId].forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'card';
+                card.className = 'card' + (levelId === 'red' ? ' red-word' : '');
                 card.innerHTML = `
                     <div class="speaking-ring"></div>
-                    <span class="letter-hint">${item.letter}</span>
-                    <span class="word">${item.word}</span>
+                    <span class="letter-hint">${item.l}</span>
+                    <span class="word">${item.w}</span>
                 `;
-                card.onclick = () => speakSequenced(item.letter, item.word, card);
+                card.onclick = () => speakSequenced(item.l, item.w, card);
                 grid.appendChild(card);
             });
         }
 
         function speakSequenced(letter, word, element) {
             window.speechSynthesis.cancel();
-            
+            document.querySelectorAll('.card').forEach(c => {
+                c.classList.remove('active');
+                c.querySelector('.speaking-ring').style.display = 'none';
+            });
+
             const msg = new SpeechSynthesisUtterance();
             msg.text = `${letter}. ... ... ${word}`;
-            msg.rate = 0.7; 
-            msg.pitch = 1.2;
+            msg.rate = 0.8; 
+            msg.pitch = 1.05; 
             
             const voices = window.speechSynthesis.getVoices();
             const bestVoice = voices.find(v => v.name.includes('Google US English')) || 
@@ -188,22 +190,26 @@
                               voices[0];
             if (bestVoice) msg.voice = bestVoice;
 
-            // UX Feedback
             element.classList.add('active');
             const ring = element.querySelector('.speaking-ring');
             ring.style.display = 'block';
 
             msg.onend = () => {
-                stars++;
-                document.getElementById('star-count').innerText = stars;
-                ring.style.display = 'none';
-                setTimeout(() => element.classList.remove('active'), 1000);
+                if (element.classList.contains('active')) {
+                    stars++;
+                    document.getElementById('star-count').innerText = stars;
+                    ring.style.display = 'none';
+                    setTimeout(() => {
+                        if (element.classList.contains('active')) {
+                            element.classList.remove('active');
+                        }
+                    }, 1200);
+                }
             };
-
             window.speechSynthesis.speak(msg);
         }
 
-        window.onload = () => loadLevel(1, document.querySelector('.level-btn'));
+        window.onload = () => loadLevel('l1', document.querySelector('.level-btn'));
         window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     </script>
 </body>
