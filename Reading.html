@@ -3,81 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Reading Adventure</title>
+    <title>Reading Adventure</title>
     <style>
+        /* Colorful and kid-friendly design */
         body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            background-color: #f0faff;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
             text-align: center;
-            padding: 20px;
+            padding: 40px 20px;
+            color: #333;
         }
 
-        h1 { color: #ff6347; font-size: 3rem; }
+        h1 { color: #ff4757; font-size: 3.5rem; margin-bottom: 10px; text-shadow: 2px 2px #fff; }
+        p { font-size: 1.5rem; color: #57606f; margin-bottom: 40px; }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            max-width: 800px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 25px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
         .card {
             background: white;
-            border: 4px solid #4ca1af;
-            border-radius: 20px;
-            padding: 20px;
+            border: 6px solid #1e90ff;
+            border-radius: 30px;
+            padding: 30px 10px;
             cursor: pointer;
-            transition: transform 0.2s;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .card:hover { transform: scale(1.1); background-color: #fff4e1; }
+        /* Fun hover effect */
+        .card:hover {
+            transform: translateY(-10px) rotate(2deg);
+            border-color: #ffa502;
+            background-color: #fffaf0;
+        }
 
-        .letter { font-size: 4rem; display: block; font-weight: bold; color: #2c3e50; }
-        .word { font-size: 1.2rem; color: #7f8c8d; visibility: hidden; }
+        .letter {
+            font-size: 5rem;
+            display: block;
+            font-weight: bold;
+            color: #2f3542;
+            margin-bottom: 10px;
+        }
 
-        .card.active .word { visibility: visible; }
+        .word {
+            font-size: 1.8rem;
+            color: #2ed573;
+            font-weight: bold;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card.active .word { opacity: 1; }
+
+        /* Small animation to show the card is speaking */
+        .speaking-ring {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            background-color: #ff4757;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <h1>Let's Read! 🍎</h1>
-    <p>Click a card to hear the sound!</p>
+    <h1>Reading Adventure 🍎</h1>
+    <p>Tap a letter to hear its name and word!</p>
 
     <div class="grid">
-        <div class="card" onclick="playLetter('A', 'Apple')">
+        <div class="card" onclick="speak('Aa', 'Apple', this)">
+            <div class="speaking-ring"></div>
             <span class="letter">Aa</span>
             <span class="word">Apple</span>
         </div>
 
-        <div class="card" onclick="playLetter('B', 'Ball')">
+        <div class="card" onclick="speak('Bb', 'Ball', this)">
+            <div class="speaking-ring"></div>
             <span class="letter">Bb</span>
             <span class="word">Ball</span>
         </div>
 
-        <div class="card" onclick="playLetter('C', 'Cat')">
+        <div class="card" onclick="speak('Cc', 'Cat', this)">
+            <div class="speaking-ring"></div>
             <span class="letter">Cc</span>
             <span class="word">Cat</span>
         </div>
 
-        <div class="card" onclick="playLetter('D', 'Dog')">
+        <div class="card" onclick="speak('Dd', 'Dog', this)">
+            <div class="speaking-ring"></div>
             <span class="letter">Dd</span>
             <span class="word">Dog</span>
+        </div>
+        
+        <div class="card" onclick="speak('Ee', 'Elephant', this)">
+            <div class="speaking-ring"></div>
+            <span class="letter">Ee</span>
+            <span class="word">Elephant</span>
         </div>
     </div>
 
     <script>
-        function playLetter(letter, word) {
-            // This uses the browser's built-in voice
-            const msg = new SpeechSynthesisUtterance();
-            msg.text = `${letter}. ${letter} is for ${word}`;
-            msg.rate = 0.8; // Slower for kids
-            window.speechSynthesis.speak(msg);
+        function speak(letterSet, word, element) {
+            // Cancel any current speaking so voices don't overlap
+            window.speechSynthesis.cancel();
 
-            // Toggle visual word
-            event.currentTarget.classList.toggle('active');
+            const msg = new SpeechSynthesisUtterance();
+            
+            // FIX: Only take the first letter (the capital one)
+            const singleLetter = letterSet.charAt(0);
+            
+            // Create a natural sentence with a pause
+            msg.text = `${singleLetter}. ... ${word}`;
+            
+            // Settings for a friendly, clear voice
+            msg.rate = 0.75;  // Slow enough for learners
+            msg.pitch = 1.2; // Slightly higher/cheerier pitch
+            msg.volume = 1;
+
+            // TRY TO FIND A BETTER VOICE
+            const voices = window.speechSynthesis.getVoices();
+            
+            // Priority: Google Natural -> Premium -> Standard Female -> Any
+            const bestVoice = voices.find(v => v.name.includes('Google US English')) || 
+                              voices.find(v => v.name.includes('Natural')) ||
+                              voices.find(v => v.lang.includes('en-US')) ||
+                              voices[0];
+
+            if (bestVoice) msg.voice = bestVoice;
+
+            // Visual feedback
+            element.classList.add('active');
+            const ring = element.querySelector('.speaking-ring');
+            ring.style.display = 'block';
+
+            // Clean up visual feedback when done speaking
+            msg.onend = function() {
+                ring.style.display = 'none';
+                setTimeout(() => element.classList.remove('active'), 1000);
+            };
+
+            window.speechSynthesis.speak(msg);
         }
+
+        // Essential: Browsers need to "warm up" the voice list
+        window.speechSynthesis.onvoiceschanged = () => {
+            console.log("Voices loaded and ready!");
+        };
     </script>
 
 </body>
