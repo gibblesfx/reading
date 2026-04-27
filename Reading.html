@@ -49,7 +49,8 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            /* Increased minimum width slightly to help long words */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
             gap: 20px;
             max-width: 1200px;
             margin: 0 auto;
@@ -60,7 +61,7 @@
             background: white;
             border: 5px solid #1e90ff;
             border-radius: 25px;
-            padding: 20px 10px;
+            padding: 15px 5px; /* Reduced side padding to give text more room */
             cursor: pointer;
             position: relative;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -70,7 +71,7 @@
             justify-content: center;
             align-items: center;
             min-height: 160px;
-            overflow: hidden; /* Prevents text bleeding out */
+            overflow: hidden; 
         }
 
         .card:hover {
@@ -79,25 +80,24 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.1);
         }
 
-        /* Base styles for hints */
         .hint-text {
             display: block;
             font-weight: bold;
             color: #2f3542;
-            white-space: nowrap; /* Forces text to stay on one line */
-            width: 90%;
+            white-space: nowrap;
+            width: 100%; /* Use full width for centering logic */
+            text-align: center;
             transition: color 0.3s;
         }
 
         .word-label { 
-            font-size: 1.4rem; 
+            font-size: 1.3rem; 
             color: #2ed573; 
             font-weight: bold; 
             display: block; 
             opacity: 0; 
             transition: 0.3s; 
             margin-top: 10px;
-            white-space: nowrap;
         }
 
         .card.red-word { border-color: #ff4757; }
@@ -110,10 +110,10 @@
         .speaking-ring {
             display: none;
             position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 20px;
-            height: 20px;
+            top: 10px;
+            right: 10px;
+            width: 18px;
+            height: 18px;
             background-color: #ff4757;
             border-radius: 50%;
             animation: pulse 1s infinite;
@@ -155,7 +155,7 @@
 
     <script>
         const wordData = {
-            l1: [{w:"ANT", l:"A"}, {w:"BAT", l:"B"}, {w:"CAT", l:"C"}, {w:"DOG", l:"D"}, {w:"EGG", l:"E"}, {w:"FAN", l:"F"}, {w:"GUM", l:"G"}, {w:"HAT", l:"H"}, {w:"INK", l:"I"}, {w:"JAM", l:"J"}, {w:"KIT", l:"K"}, {w:"LOG", l:"L"}, {w:"MAP", l:"M"}, {w:"NET", l:"N"}, {w:"OWL", l:"O"}, {w:"PIG", l:"P"}, {w:"QUI", l:"Q"}, {w:"RUN", l:"R"}, {w:"SUN", l:"S"}, {w:"TEN", l:"T"}, {w:"UP!", l:"U"}, {w:"VAN", l:"V"}, {w:"WIG", l:"W"}, {w:"SIX", l:"X"}, {w:"YAK", l:"Y"}, {w:"ZAP", l:"Z"}],
+            l1: [{w:"ANT", l:"A"}, {w:"BAT", l:"B"}, {w:"CAT", l:"C"}, {w:"DOG", l:"D"}, {w:"EGG", l:"E"}, {w:"FAN", l:"F"}, {w:"GUM", l:"G"}, {w:"HAT", l:"H"}, {w:"INK", l:"I"}, {w:"JAM", l:"J"}, {w:"KIT", l:"K"}, {w:"LOG", l:"L"}, {w:"MAP", l:"M"}, {w:"NET", l:"N"}, {w:"OWL", l:"O"}, {w:"PIG", l:"P"}, {w:"QUB", l:"Q"}, {w:"RUN", l:"R"}, {w:"SUN", l:"S"}, {w:"TEN", l:"T"}, {w:"UP!", l:"U"}, {w:"VAN", l:"V"}, {w:"WIG", l:"W"}, {w:"BOX", l:"X"}, {w:"YAK", l:"Y"}, {w:"ZAP", l:"Z"}],
             l2: [{w:"ATOM", l:"A"}, {w:"BIRD", l:"B"}, {w:"CAKE", l:"C"}, {w:"DUCK", l:"D"}, {w:"EAST", l:"E"}, {w:"FISH", l:"F"}, {w:"GATE", l:"G"}, {w:"HAND", l:"H"}, {w:"IRON", l:"I"}, {w:"JEEP", l:"J"}, {w:"KITE", l:"K"}, {w:"LAMP", l:"L"}, {w:"MOON", l:"M"}, {w:"NEST", l:"N"}, {w:"OPEN", l:"O"}, {w:"PINK", l:"P"}, {w:"QUIT", l:"Q"}, {w:"RAIN", l:"R"}, {w:"STAR", l:"S"}, {w:"TREE", l:"T"}, {w:"UNIT", l:"U"}, {w:"VEST", l:"V"}, {w:"WIND", l:"W"}, {w:"EXIT", l:"X"}, {w:"YELL", l:"Y"}, {w:"ZOOM", l:"Z"}],
             l3: [{w:"APPLE", l:"A"}, {w:"BREAD", l:"B"}, {w:"CLOCK", l:"C"}, {w:"DRESS", l:"D"}, {w:"EAGLE", l:"E"}, {w:"FRUIT", l:"F"}, {w:"GRAPE", l:"G"}, {w:"HOUSE", l:"H"}, {w:"IGLOO", l:"I"}, {w:"JELLY", l:"J"}, {w:"KOALA", l:"K"}, {w:"LEMON", l:"L"}, {w:"MOUSE", l:"M"}, {w:"NIGHT", l:"N"}, {w:"OCEAN", l:"O"}, {w:"PLANE", l:"P"}, {w:"QUEEN", l:"Q"}, {w:"ROBOT", l:"R"}, {w:"SNAKE", l:"S"}, {w:"TRAIN", l:"T"}, {w:"UNCLE", l:"U"}, {w:"VOICE", l:"V"}, {w:"WATER", l:"W"}, {w:"XYLO", l:"X"}, {w:"YOUNG", l:"Y"}, {w:"ZEBRA", l:"Z"}],
             l4: [{w:"BRUSH", m:"word"}, {w:"SMILE", m:"word"}, {w:"PLANT", m:"word"}, {w:"STAMP", m:"word"}, {w:"SWIM", m:"word"}, {w:"GLASS", m:"word"}, {w:"TRASH", m:"word"}, {w:"CRAB", m:"word"}, {w:"FLIP", m:"word"}, {w:"DRIP", m:"word"}, {w:"SKIP", m:"word"}, {w:"STOP", m:"word"}],
@@ -168,11 +168,27 @@
 
         function getFontSize(text, isWordMode) {
             const len = text.length;
-            if (!isWordMode) return "4.5rem"; // Large for single letters
-            if (len <= 5) return "2.5rem";
-            if (len <= 8) return "2rem";
-            if (len <= 12) return "1.5rem";
-            return "1.2rem"; // Smallest for long sentences
+            if (!isWordMode) return "4.5rem";
+            
+            // New aggressive scaling to prevent "Elephant" and "Dinosaur" from clipping
+            if (len <= 4) return "2.8rem";
+            if (len <= 6) return "2.3rem";
+            if (len <= 8) return "1.8rem"; // elephant, rainbow
+            if (len <= 10) return "1.5rem"; // dinosaur, umbrella
+            return "1.2rem"; // sentences
+        }
+
+        function fixSpokenContent(text, isLetter) {
+            const upper = text.toUpperCase();
+            if (isLetter) {
+                if (upper === 'V') return 'Vee';
+                if (upper === 'Q') return 'Kew';
+                if (upper === 'X') return 'Ex';
+                return text;
+            }
+            if (upper === 'QUB') return 'Cube';
+            if (upper === 'XYLO') return 'Xylophone';
+            return text;
         }
 
         function loadLevel(levelId, btn) {
@@ -208,7 +224,9 @@
         function speakSequenced(letter, word, element) {
             window.speechSynthesis.cancel();
             resetUI();
-            const msg = new SpeechSynthesisUtterance(`${letter}. ... ... ${word}`);
+            const fixedLetter = fixSpokenContent(letter, true);
+            const fixedWord = fixSpokenContent(word, false);
+            const msg = new SpeechSynthesisUtterance(`${fixedLetter}. ... ... ${fixedWord}`);
             setupVoice(msg, 0.8);
             attachEvents(msg, element);
             window.speechSynthesis.speak(msg);
@@ -217,7 +235,8 @@
         function speakFullWord(word, element) {
             window.speechSynthesis.cancel();
             resetUI();
-            const msg = new SpeechSynthesisUtterance(`${word}. ... ... ${word}`);
+            const fixedWord = fixSpokenContent(word, false);
+            const msg = new SpeechSynthesisUtterance(`${fixedWord}. ... ... ${fixedWord}`);
             setupVoice(msg, 0.75);
             attachEvents(msg, element);
             window.speechSynthesis.speak(msg);
