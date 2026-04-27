@@ -68,12 +68,7 @@
             min-height: 220px;
         }
 
-        .card:hover {
-            transform: translateY(-12px) rotate(3deg);
-            border-color: #ffa502;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-        }
-
+        .card:hover { transform: translateY(-12px) rotate(3deg); border-color: #ffa502; box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
         .card.active { border-color: #2ed573; background-color: #f0fff4; transform: scale(1.05); }
 
         .speaking-dot {
@@ -96,11 +91,8 @@
         .letter-header { font-size: 3.5rem; color: #1e90ff; font-weight: bold; margin-bottom: 5px; }
         .target-word { font-weight: bold; color: #2f3542; font-size: 2.4rem; }
         
-        .card.red-word { border-color: #ff4757; }
-        .card.red-word .letter-header { color: #ff4757; }
-
         .blend-display { font-size: 4rem; letter-spacing: 15px; margin-bottom: 20px; font-weight: bold; }
-        .char-active { color: #ffa502; transform: scale(1.35); display: inline-block; transition: all 0.1s ease; }
+        .char-active { color: #ffa502; transform: scale(1.4); display: inline-block; transition: all 0.1s ease; }
 
         .slider-container { width: 90%; margin-top: 15px; }
         input[type=range] { width: 100%; cursor: pointer; height: 35px; }
@@ -142,16 +134,16 @@
             l6: [{w:"I LIKE CATS", l:"-"}, {w:"SEE THE DOG", l:"-"}, {w:"MY BIG RED HAT", l:"-"}, {w:"GO TO THE BED", l:"-"}, {w:"A FAST BLUE JEEP", l:"-"}, {w:"CAN YOU RUN?", l:"-"}, {w:"I SEE THE SUN", l:"-"}, {w:"THE BOX IS BIG", l:"-"}, {w:"LOOK AT THE PIG", l:"-"}, {w:"WE CAN PLAY", l:"-"}, {w:"THE CAT IS ON THE MAT", l:"-"}, {w:"I LIKE TO SWIM", l:"-"}, {w:"SEE THE GREEN TREE", l:"-"}, {w:"MY MOM IS KIND", l:"-"}, {w:"THE DUCK CAN QUACK", l:"-"}, {w:"HE HAS A TOY", l:"-"}, {w:"SHE SAW THE BIRD", l:"-"}, {w:"WE WENT TO THE PARK", l:"-"}, {w:"I CAN READ WORDS", l:"-"}, {w:"YOU ARE A STAR", l:"-"}],
             red: [{w:"THE", l:"T"}, {w:"SAID", l:"S"}, {w:"WAS", l:"W"}, {w:"ARE", l:"A"}, {w:"YOU", l:"Y"}, {w:"THEY", l:"T"}, {w:"FROM", l:"F"}, {w:"DOES", l:"D"}, {w:"WHAT", l:"W"}, {w:"WANT", l:"W"}, {w:"GIVE", l:"G"}, {w:"SOME", l:"S"}, {w:"BECAUSE", l:"B"}, {w:"COULD", l:"C"}, {w:"YOUR", l:"Y"}, {w:"PEOPLE", l:"P"}, {w:"THROUGH", l:"T"}, {w:"THOUGHT", l:"T"}, {w:"LAUGH", l:"L"}, {w:"WHO", l:"W"}, {w:"WERE", l:"W"}, {w:"WHERE", l:"W"}, {w:"ONCE", l:"O"}, {w:"DOOR", l:"D"}, {w:"EYE", l:"E"}],
             blend: [
-                {w:"CAT", p:["k", "ah", "t"]}, 
-                {w:"DOG", p:["d", "aw", "g"]}, 
-                {w:"SUN", p:["s", "uh", "n"]}, 
-                {w:"MAP", p:["m", "ah", "p"]}, 
-                {w:"TEN", p:["t", "eh", "n"]}, 
-                {w:"PIG", p:["p", "ih", "g"]}, 
-                {w:"FOX", p:["f", "aw", "ks"]}, 
-                {w:"BAT", p:["b", "ah", "t"]}, 
-                {w:"JAM", p:["j", "ah", "m"]}, 
-                {w:"LOG", p:["l", "aw", "g"]}
+                {w:"CAT", p:["kuh", "aaaa", "tuh"]}, 
+                {w:"DOG", p:["duh", "oooo", "guh"]}, 
+                {w:"SUN", p:["ssss", "uhhh", "nnnn"]}, 
+                {w:"MAP", p:["mmmm", "aaaa", "puh"]}, 
+                {w:"TEN", p:["tuh", "eeee", "nnnn"]}, 
+                {w:"PIG", p:["puh", "iiii", "guh"]}, 
+                {w:"FOX", p:["ffff", "oooo", "ks"]}, 
+                {w:"BAT", p:["buh", "aaaa", "tuh"]}, 
+                {w:"JAM", p:["juh", "aaaa", "mmmm"]}, 
+                {w:"LOG", p:["llll", "oooo", "guh"]}
             ]
         };
 
@@ -176,26 +168,15 @@
                 const card = document.createElement('div');
                 card.className = 'card' + (levelId === 'red' ? ' red-word' : '');
                 if(levelId === 'blend') {
-                    // Blend Card Template
                     const word = item.w;
                     const chars = word.split('');
                     let wordHtml = `<div class="blend-display">`;
                     chars.forEach((c, i) => wordHtml += `<span id="char-${word}-${i}">${c}</span>`);
                     wordHtml += `</div>`;
                     
-                    card.innerHTML = `
-                        <div class="speaking-dot"></div>
-                        ${wordHtml}
-                        <div class="slider-container">
-                            <input type="range" min="0" max="${chars.length + 1}" value="0" 
-                            oninput="handleBlend(this, '${word}', this.parentElement.parentElement)">
-                        </div>
-                        <p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>`;
-                    
-                    // Store phonetics on the element directly to avoid stringify issues
+                    card.innerHTML = `<div class="speaking-dot"></div>${wordHtml}<div class="slider-container"><input type="range" min="0" max="${chars.length + 1}" value="0" oninput="handleBlend(this, '${word}', this.parentElement.parentElement)"></div><p style="color:#aaa; font-size:0.8rem">Slide to sound it out!</p>`;
                     card.dataset.phonetics = JSON.stringify(item.p);
                 } else {
-                    // Standard Card Template
                     const isSentence = item.l === "-";
                     card.innerHTML = `<div class="speaking-dot"></div><span class="letter-header">${isSentence ? "" : item.l + item.l.toLowerCase()}</span><span class="target-word" style="font-size: ${isSentence ? '1.8rem' : '2.4rem'}">${item.w}</span>`;
                     card.onclick = () => {
@@ -203,17 +184,10 @@
                         card.classList.add('active');
                         const dot = card.querySelector('.speaking-dot');
                         dot.style.display = 'block';
-                        
                         const msg = new SpeechSynthesisUtterance(isSentence ? item.w.toLowerCase() : `${item.l.toLowerCase()}... ${item.w.toLowerCase()}`);
                         msg.voice = getBestVoice();
                         msg.rate = isSentence ? 0.8 : 0.9;
-                        
-                        msg.onend = () => {
-                            stars++;
-                            document.getElementById('star-count').innerText = stars;
-                            dot.style.display = 'none';
-                            card.classList.remove('active');
-                        };
+                        msg.onend = () => { stars++; document.getElementById('star-count').innerText = stars; dot.style.display = 'none'; card.classList.remove('active'); };
                         window.speechSynthesis.speak(msg);
                     };
                 }
@@ -228,32 +202,23 @@
             const dot = card.querySelector('.speaking-dot');
             const phonetics = JSON.parse(card.dataset.phonetics);
             
-            // 1. Reset all letter highlights in this card
-            chars.forEach((_, i) => {
-                const el = document.getElementById(`char-${word}-${i}`);
-                if (el) el.className = '';
-            });
+            chars.forEach((_, i) => { const el = document.getElementById(`char-${word}-${i}`); if (el) el.className = ''; });
 
             if (val > 0) {
                 dot.style.display = 'block';
                 let msg;
 
                 if (val <= chars.length) {
-                    // Step: Individual PHONETIC SOUNDS
                     const index = val - 1;
                     const letterSpan = document.getElementById(`char-${word}-${index}`);
                     if(letterSpan) letterSpan.className = 'char-active';
                     
+                    // The "Force Sound" logic: lower pitch and slower rate for the phoneme
                     msg = new SpeechSynthesisUtterance(phonetics[index]);
-                    msg.rate = 0.9;
-                    msg.pitch = 1.1;
+                    msg.rate = 0.6; 
+                    msg.pitch = 0.8; 
                 } else {
-                    // Final Step: FULL WORD
-                    chars.forEach((_, i) => {
-                        const el = document.getElementById(`char-${word}-${i}`);
-                        if (el) el.className = 'char-active';
-                    });
-                    
+                    chars.forEach((_, i) => { const el = document.getElementById(`char-${word}-${i}`); if (el) el.className = 'char-active'; });
                     msg = new SpeechSynthesisUtterance(word.toLowerCase());
                     msg.rate = 0.7;
                     msg.onend = () => {
@@ -261,20 +226,14 @@
                         document.getElementById('star-count').innerText = stars;
                         setTimeout(() => {
                             slider.value = 0;
-                            chars.forEach((_, i) => {
-                                const el = document.getElementById(`char-${word}-${i}`);
-                                if (el) el.className = '';
-                            });
+                            chars.forEach((_, i) => { const el = document.getElementById(`char-${word}-${i}`); if (el) el.className = ''; });
                             dot.style.display = 'none';
                         }, 1200);
                     };
                 }
-                
                 msg.voice = getBestVoice();
                 window.speechSynthesis.speak(msg);
-            } else {
-                dot.style.display = 'none';
-            }
+            } else { dot.style.display = 'none'; }
         }
 
         window.onload = () => loadLevel('l1', document.querySelector('.level-btn'));
